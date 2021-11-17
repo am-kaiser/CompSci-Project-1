@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import random as npr
 
+
 def bootstrap(x, y, sample_ratio):
     n = np.size(y)
     sample_size = int(np.floor(sample_ratio*n))
