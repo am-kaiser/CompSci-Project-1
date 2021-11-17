@@ -35,13 +35,13 @@ def perform_OLS(input_x1, input_x2, obs_var, order, train_frac, bootstrap=False)
         The train ratio is the fraction of data that is used as training data.
         Additional parameter enables bootstrap resampling.
     """
-    if bootstrap:
-        # Perform bootstrap
-        input_x1, input_x1, obs_var = prepare_data.bootstrap(input_x1, input_x2, obs_var)
-
     # Split data in test and train datasets
     x1_train, x2_train, x1_test, x2_test, y_train, y_test = prepare_data.split_test_train(input_x1, input_x2, obs_var,
                                                                                           train_fraction=train_frac)
+
+    if bootstrap:
+        # Perform bootstrap
+        x1_train, x2_train, y_train = prepare_data.bootstrap(x1_train, x2_train, y_train)
 
     # Calculate beta and response variable for train dataset
     beta_OLS_train, resp_var_OLS_train = calculate_OLS(x1_train, x2_train, y_train, order)
@@ -69,15 +69,18 @@ if __name__ == "__main__":
                                                                    points=100)
 
     # Fit model for different polynomial
-    max_order = 5
+    max_order = 2
     orders = range(1, max_order+1)
     MSE_train = np.empty([1, max_order])
     R2_train = np.empty([1, max_order])
     MSE_test = np.empty([1, max_order])
     R2_test = np.empty([1, max_order])
 
-    for index, order in enumerate(orders):
-        _, _, _, MSE_train[:, index], MSE_test[:, index], R2_train[:, index], R2_test[:, index] = perform_OLS(input_x1, input_x2, obs_var, order, train_frac=0.8, bootstrap=True)
+    for i, order in enumerate(orders):
+        _, _, _, MSE_train[:, i], MSE_test[:, i], R2_train[:, i], R2_test[:, i] = perform_OLS(input_x1, input_x2,
+                                                                                              obs_var, order,
+                                                                                              train_frac=0.8,
+                                                                                              bootstrap=True)
 
     # Plot errors
     axes_1 = np.array(orders)

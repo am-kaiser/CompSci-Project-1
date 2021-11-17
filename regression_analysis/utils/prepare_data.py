@@ -35,3 +35,7 @@ def bootstrap(x1, x2, y):
     y_boot = data_boot[:, 2].reshape(y.shape[0], y.shape[1])
 
     return x1_boot, x2_boot, y_boot
+
+
+def cross_validation(x1, x2, y, k_fold):
+    """Perform cross-validation to data."""

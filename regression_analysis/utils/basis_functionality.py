@@ -18,7 +18,9 @@ class Design_Matrix_2D:
     def make_ploynomial_power(self):
         """Create array with the powers of the polynomial which will be fitted."""
         order_range = range(self.order+1)
-        return np.array(np.meshgrid(order_range, order_range)).T.reshape(-1, 2)
+        order_options = np.array(np.meshgrid(order_range, order_range)).T.reshape(-1, 2)
+        row_sum = np.sum(order_options, axis=1) <= self.order
+        return order_options[row_sum, :]
 
     def make_design_matrix(self):
         """Define design matrix D for given input. Order is the order of the polynomial which will be
