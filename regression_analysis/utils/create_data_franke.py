@@ -1,9 +1,6 @@
 """script to create data file based on the Franke function"""
 
-import create_plots as own_plots
-
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 def generate_input_values(uniform=False, points=100):
@@ -48,8 +45,3 @@ if __name__ == "__main__":
 
     # Generate data
     x1, x2, f = generate_data()
-
-    # Create plot of Franke function
-    own_plots.make_3d_surface_plot(x1, x2, f, "Plot of Franke funtion")
-    # Display plot
-    plt.show()

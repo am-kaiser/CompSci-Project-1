@@ -20,7 +20,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/am-kaiser/CompSci-Project-1.git",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(include=["regression_analysis", "regression_analysis.*"]),
     classifiers=[
         'Intended Audience :: Science/Research',
         'Programming Language :: Python :: 3',

@@ -34,7 +34,7 @@ class Design_Matrix_2D:
         return D
 
     def design_matrix_product_inverse(self):
-        """To calculate any parameter vectors/beta (independent of the regression type) inverse of A=(D.T*D) has to be 
+        """To calculate any parameter vectors/beta (independent of the regression type) inverse of A=(D.T*D) has to be
         calculated. D is  the design matrix. """
         # Get design matrix
         D = self.make_design_matrix()
