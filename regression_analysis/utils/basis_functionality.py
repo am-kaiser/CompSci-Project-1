@@ -35,12 +35,8 @@ class Design_Matrix_2D:
 
         return D
 
-    def design_matrix_product_inverse(self):
-        """To calculate any parameter vectors/beta (independent of the regression type) inverse of A=(D.T*D) has to be
-        calculated. D is  the design matrix. """
-        # Get design matrix
-        D = self.make_design_matrix()
-        A = np.dot(D.T, D)
+    def calculate_matrix_inverse(self, A):
+        """Calculate the inverse of a matrix."""
         # Decide which algorithm will be used to calculate the inverse
         # Note: The condition number of a matrix is a measure of how close the matrix is to being singular. A large
         # condition number means that the matrix is close to being singular.
@@ -51,6 +47,16 @@ class Design_Matrix_2D:
             U, S, V_t = np.linalg.svd(A)
             S_inverse = np.linalg.inv(np.diag(S))
             A_inverse = np.dot(V_t.T, np.dot(S_inverse, U.T))
+        return A_inverse
+
+    def design_matrix_product_inverse(self):
+        """To calculate any parameter vectors/beta for ordinary least squares inverse of A=(D.T*D) has to be
+        calculated. D is  the design matrix. """
+        # Get design matrix
+        D = self.make_design_matrix()
+        A = np.dot(D.T, D)
+        # Get inverse of A
+        A_inverse = self.calculate_matrix_inverse(A)
 
         return A_inverse
 

@@ -1,6 +1,13 @@
 """Collection of functions to prepare data for further analysis."""
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
+
+
+def scale_data(data):
+    """Use min-max normalization to scale data."""
+    norm_data = (data - np.min(data)) / (np.max(data) - np.min(data))
+    return norm_data
 
 
 def split_test_train(x1, x2, y, train_fraction=0.8):
@@ -37,5 +44,22 @@ def bootstrap(x1, x2, y):
     return x1_boot, x2_boot, y_boot
 
 
-def cross_validation(x1, x2, y, k_fold):
-    """Perform cross-validation to data."""
+def cross_validation(x1, x2, y, num_fold):
+    """Perform cross-validation to data.
+    Inspired by https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html"""
+    x = np.hstack([x1, x2])
+    k_fold = KFold(n_splits=num_fold, shuffle=True)
+
+    # Split data
+    for train_index, test_index in k_fold.split(x):
+        X_train, X_test = x[train_index], x[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+
+    # Return x1 and x2 to original shape
+    x1_train = X_train[:, :x1.shape[1]]
+    x2_train = X_train[:, x1.shape[1]:]
+
+    x1_test = X_test[:, :x1.shape[1]]
+    x2_test = X_test[:, x1.shape[1]:]
+
+    return x1_train, x2_train, x1_test, x2_test, y_train, y_test
