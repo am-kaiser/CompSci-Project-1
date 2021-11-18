@@ -46,14 +46,20 @@ def perform_OLS(input_x1, input_x2, obs_var, order, train_frac, cross_val=False,
         # Perform cross-validation
         x1_train, x2_train, x1_test, x2_test, y_train, y_test = prepare_data.cross_validation(input_x1, input_x2,
                                                                                               obs_var, num_fold)
+    elif bootstrap:
+        # Split data in test and train datasets
+        x1_train, x2_train, x1_test, x2_test, y_train, y_test = prepare_data.split_test_train(input_x1, input_x2,
+                                                                                              obs_var,
+                                                                                              train_fraction=train_frac,
+                                                                                              do_shuffle=False)
+        # Perform bootstrap
+        x1_train, x2_train, y_train = prepare_data.bootstrap(x1_train, x2_train, y_train)
     else:
         # Split data in test and train datasets
         x1_train, x2_train, x1_test, x2_test, y_train, y_test = prepare_data.split_test_train(input_x1, input_x2,
                                                                                               obs_var,
-                                                                                              train_fraction=train_frac)
-        if bootstrap:
-            # Perform bootstrap
-            x1_train, x2_train, y_train = prepare_data.bootstrap(x1_train, x2_train, y_train)
+                                                                                              train_fraction=train_frac,
+                                                                                              do_shuffle=True)
 
     # Step 3: Calculate OLS
     # Calculate beta and response variable for train dataset

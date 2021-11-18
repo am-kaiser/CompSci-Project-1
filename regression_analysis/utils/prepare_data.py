@@ -10,11 +10,11 @@ def scale_data(data):
     return norm_data
 
 
-def split_test_train(x1, x2, y, train_fraction=0.8):
+def split_test_train(x1, x2, y, train_fraction=0.8, do_shuffle=True):
     """Split data into train and test datasets."""
     # Use scikit learn to split data
     in_train, in_test, y_train, y_test = train_test_split(np.hstack([x1, x2]), y, train_size=train_fraction,
-                                                          shuffle=False)
+                                                          shuffle=do_shuffle)
 
     # Split in_train and in_test in x1 and x2 again
     x1_train = in_train[:, 0:x1.shape[0]]
