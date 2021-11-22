@@ -5,14 +5,15 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 
-def make_multi_line_plot(x, y, line_lab, fig=None, position=111):
+def make_multi_line_plot(x, y, line_lab, fig=None, position=111, ylim=[-1, 1]):
     """Make a figure with multiple lines but same values for x."""
     if not(fig):
         fig = plt.figure()
     ax = fig.add_subplot(position)
     num_lines = y.shape[0]
     for index in range(num_lines):
-        ax.plot(x, y[index, :], label=line_lab[index])
+        ax.plot(x, y[index, :], 'o', label=line_lab[index])
+    ax.set_ylim(ylim)
     ax.legend()
 
 

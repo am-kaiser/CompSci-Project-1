@@ -1,7 +1,6 @@
 """Collection of functions to prepare data for further analysis."""
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import KFold
 
 
 def scale_data(data):
@@ -46,21 +45,39 @@ def bootstrap(x1, x2, y):
 
 
 def cross_validation(x1, x2, y, num_fold):
-    """Perform cross-validation to data.
-    Inspired by https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.KFold.html"""
+    """Perform cross-validation to data."""
+    # Reshape input
+    x1 = x1.flatten().reshape(x1.shape[0]*x1.shape[1], 1)
+    x2 = x2.flatten().reshape(x2.shape[0]*x2.shape[1], 1)
+    y = y.flatten().reshape(y.shape[0]*y.shape[1], 1)
+
     x = np.hstack([x1, x2])
-    k_fold = KFold(n_splits=num_fold, shuffle=True)
+
+    # Define number of points per fold
+    num_points = np.shape(x)[0]
+    num_points_fold = int(np.floor(num_points/num_fold))
+
+    # Shuffle data
+    ind = np.arange(num_points)
+    np.random.shuffle(ind)
+    x = x[ind]
+    y = y[ind]
+
+    # Initialize placeholders
+    x_test_arr = np.zeros([num_fold, num_points_fold, 2])
+    y_test_arr = np.zeros([num_fold, num_points_fold])
+
+    x_train_arr = np.zeros([num_fold, num_points-num_points_fold, 2])
+    y_train_arr = np.zeros([num_fold, num_points-num_points_fold])
 
     # Split data
-    for train_index, test_index in k_fold.split(x):
-        X_train, X_test = x[train_index], x[test_index]
-        y_train, y_test = y[train_index], y[test_index]
+    for fold_index in np.arange(num_fold):
+        test_ind = np.arange(fold_index*num_points_fold, (fold_index+1)*num_points_fold)
+        train_ind = np.delete(np.arange(num_points), test_ind)
 
-    # Return x1 and x2 to original shape
-    x1_train = X_train[:, :x1.shape[1]]
-    x2_train = X_train[:, x1.shape[1]:]
+        x_test_arr[fold_index, :, :] = x[test_ind]
+        y_test_arr[fold_index, :] = y[test_ind, 0]
+        x_train_arr[fold_index, :, :] = x[train_ind]
+        y_train_arr[fold_index, :] = y[train_ind, 0]
 
-    x1_test = X_test[:, :x1.shape[1]]
-    x2_test = X_test[:, x1.shape[1]:]
-
-    return x1_train, x2_train, x1_test, x2_test, y_train, y_test
+    return x_train_arr, x_test_arr, y_train_arr, y_test_arr
