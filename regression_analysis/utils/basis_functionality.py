@@ -78,3 +78,11 @@ class Error_Measures:
         unten = np.sum((self.observed_values - np.mean(self.model_values))**2)
         R2 = 1 - (oben/unten)
         return R2
+
+    def variance(self):
+        variance = np.var(self.model_values)
+        return variance
+
+    def bias(self):
+        model_mean = np.mean(self.model_values)
+        return np.sum((self.observed_values-model_mean)**2)
