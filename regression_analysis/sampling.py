@@ -3,12 +3,16 @@ from numpy import random as npr
 
 
 def bootstrap(x, y, sample_ratio):
+    """
+    generates bootstrap samples
+    """
     n = np.size(y)
-    sample_size = int(np.floor(sample_ratio*n))
+    sample_size = int(np.ceil((1-sample_ratio)*n))
     train_ind = np.zeros(sample_size, dtype=int)
     ind = np.arange(0,n)
-    test_ind = npr.choice(ind, sample_size)
-    train_ind = np.delete(ind, test_ind)
+    train_ind = npr.choice(ind, sample_size)
+    #test_ind = npr.choice(np.delete(ind, train_ind), n-sample_size)
+    test_ind =np.delete(ind, train_ind)
 
     x_train = x[train_ind]
     x_test = x[test_ind]
@@ -18,6 +22,9 @@ def bootstrap(x, y, sample_ratio):
     return x_train, x_test, y_train, y_test
 
 def crossvalidation(x, y, kfolds):
+    """
+    generates cross validation samples
+    """
     n = np.size(y)
     nk = int(np.floor(n/kfolds)) #number of points per fold
 
@@ -45,8 +52,9 @@ def crossvalidation(x, y, kfolds):
     return x_train_arr, x_test_arr, y_train_arr, y_test_arr
 
 if __name__ == '__main__':
-    x = np.linspace(0, 1, 10)
-    y = np.linspace(3, 5, 10)
+    x = np.linspace(1, 10, 10)
+    y = np.linspace(4, 13, 10)
     sample_ratio = 0.31
+    print(bootstrap(x,y,sample_ratio))
     print(bootstrap(x,y,sample_ratio))
 

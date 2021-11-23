@@ -3,6 +3,8 @@ from numpy import random as npr
 import findStat
 from sklearn.model_selection import train_test_split
 import sampling
+from sklearn import linear_model
+
 
 def poly_powers2D(order):
     """
@@ -74,7 +76,10 @@ class linear_regression2D():
         self.trainvar = np.nan
         self.testvar = np.nan
 
-    def apply_leastsquares(self, order=3, test_ratio=0.1, ridge=False, lmbda=0.1):
+        #scaling data using mix max scaling
+        self.y = (self.y-np.min(self.y))/(np.max(self.y)-np.min(self.y))
+
+    def apply_leastsquares(self, order=3, test_ratio=0.1, ridge=False, scikit_lasso=False, lmbda=0.1):
         """
         performs least squares
         input: order of polynomial, test ratio
@@ -97,29 +102,52 @@ class linear_regression2D():
             y_train = self.y
             y_test = np.array([])
 
+
         #find train design matrix
         X = design_mat2D(x1_train, x2_train, order)
 
         #finding model parameters
-        if not ridge:
+        """
+        if not (ridge and scikit_lasso):
             beta = find_ols_params(X, y_train)
         elif ridge:
             beta = find_ridge_params(X, y_train, lmbda)
-        
-        y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta) #fitting training data
+        else: #scikit_lasso
+            lasso_reg = linear_model.Lasso(lmbda)
+            lasso_reg.fit(X, y_train)
+            y_model_train = lasso_reg.fit(X)
+            y_model_test = lasso_reg.fit(np.array(design_mat2D(x1_test, x2_test, order)))
+        """
+        if scikit_lasso:
+            lasso_reg = linear_model.Lasso(lmbda, fit_intercept=False)
+            lasso_reg.fit(X, y_train)
+            y_model_train = lasso_reg.predict(X)
+            y_model_test = lasso_reg.predict(np.array(design_mat2D(x1_test, x2_test, order)))
+            print(lasso_reg.coef_)
+        elif ridge:
+            beta = find_ridge_params(X, y_train, lmbda)
+        else:
+            beta = find_ols_params(X, y_train)
+
+        if not scikit_lasso:
+            y_model_train = np.array(X @ beta) #fitting training data
+            
+            
         self.trainMSE = findStat.findMSE(y_train, y_model_train)
         self.trainR2 = findStat.findR2(y_train, y_model_train)
         self.trainbias = findStat.findBias(y_train, y_model_train)
         self.trainvar = findStat.findModelVar(y_model_train)
         
         if(test_ratio!=0.0):
-            y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta) #fitting testing data
+            if not scikit_lasso:
+                y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta) #fitting testing data
             self.testMSE = findStat.findMSE(y_test, y_model_test)
             self.testR2 = findStat.findR2(y_test, y_model_test)
             self.testbias = findStat.findBias(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
 
-    def apply_ols_with_bootstrap(self, order=3, test_ratio=0.1, n_boots=10, ridge=False, lmbda=0.1):
+
+    def apply_leastsquares_bootstrap(self, order=3, test_ratio=0.1, n_boots=10, ridge=False, lmbda=0.1):
         """
         performs least squares with bootstrap sampling
         input: order of polynomial, test ratio, number of bootstraps
@@ -163,7 +191,7 @@ class linear_regression2D():
         self.trainvar /= n_boots
         self.testvar /= n_boots
 
-    def apply_ols_with_crossvalidation(self, order=3, kfolds=10, ridge=False, lmbda=0.1):
+    def apply_leastsquares_crossvalidation(self, order=3, kfolds=10, ridge=False, lmbda=0.1):
         """
         performs least squares with k fold cross validation sampling
         input: order of polynomial, test ratio, number of folds
