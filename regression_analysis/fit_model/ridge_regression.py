@@ -1,27 +1,23 @@
 """Script to calculate Ridge Regression."""
 
-from regression_analysis.utils import create_data_franke
-from regression_analysis.utils import basis_functionality
-from regression_analysis.utils import create_plots
-from regression_analysis.utils import prepare_data
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
+from regression_analysis.utils import basis_functionality, create_data_franke, create_plots, prepare_data
 
 
-def calculate_RR(input_x1, input_x2, obs_var, order, lam, D=None, beta_RR=None):
+def calculate_RR(input_x1, input_x2, obs_var, order, lam, D=None):
     """Calculate the response variable for Ridge Regression. lam stands for lambda."""
 
-    if not(D):
+    if not D:
         # Get design matrix
         regress_obj = basis_functionality.Design_Matrix_2D(input_x1, input_x2, obs_var, order)
         D = regress_obj.make_design_matrix()
 
-    if not(beta_RR):
-        # Calculate parameter vector with given design matrix
-        regress_obj = basis_functionality.Design_Matrix_2D(input_x1, input_x2, obs_var, order)
-        temp_matrix = np.dot(D.T, D) + lam*np.identity(D.shape[1])
-        beta_RR = np.dot(np.dot(regress_obj.calculate_matrix_inverse(temp_matrix), D.T),  obs_var.flatten())
+    # Calculate parameter vector with given design matrix
+    regress_obj = basis_functionality.Design_Matrix_2D(input_x1, input_x2, obs_var, order)
+    temp_matrix = np.dot(D.T, D) + lam * np.identity(D.shape[1])
+    beta_RR = np.dot(np.dot(regress_obj.calculate_matrix_inverse(temp_matrix), D.T), obs_var.flatten())
 
     # Calculate response variable
     resp_var_RR = np.dot(D, beta_RR).reshape(obs_var.shape[0], obs_var.shape[1])
@@ -91,7 +87,6 @@ def perform_RR_cross_val(input_x1, input_x2, obs_var, order, lam, num_fold=5):
 
     # Step 3: Calculate Ridge Regression for each fold
     for fold_index in range(num_fold):
-
         x1_train = x_train_arr[fold_index, :, 0]
         x2_train = x_train_arr[fold_index, :, 1]
 
@@ -153,7 +148,6 @@ def perform_RR_bootstrap(input_x1, input_x2, obs_var, order, lam, train_frac=0.8
 
     # Step 3: Calculate RR for bootstrap
     for boot_index in range(num_boot):
-
         # Perform Boostrapping on training data
         x1_train_boot, x2_train_boot, y_train_boot = prepare_data.bootstrap(x1_train, x2_train, y_train)
 
@@ -192,7 +186,7 @@ if __name__ == "__main__":
 
     # Fit model for different polynomial
     max_order = 5
-    orders = range(1, max_order+1)
+    orders = range(1, max_order + 1)
 
     MSE_train = np.empty([1, max_order])
     R2_train = np.empty([1, max_order])

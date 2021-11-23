@@ -1,19 +1,16 @@
 """Script to calculate Lasso Regression."""
 
-from regression_analysis.utils import create_data_franke
-from regression_analysis.utils import basis_functionality
-from regression_analysis.utils import create_plots
-from regression_analysis.utils import prepare_data
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from sklearn import linear_model
+
+from regression_analysis.utils import basis_functionality, create_data_franke, create_plots, prepare_data
 
 
 def calculate_LR(input_x1, input_x2, obs_var, order, lam, D=None):
     """Calculate the response variable for Ridge Regression. lam stands for lambda."""
 
-    if not(D):
+    if not D:
         # Get design matrix
         regress_obj = basis_functionality.Design_Matrix_2D(input_x1, input_x2, obs_var, order)
         D = regress_obj.make_design_matrix()
@@ -46,7 +43,7 @@ def perform_LR(input_x1, input_x2, obs_var, order, lam, train_frac):
     # Calculate beta and response variable for train dataset
     beta_LR_train, resp_var_LR_train = calculate_LR(x1_train, x2_train, y_train, order, lam=lam)
 
-    # Calculate error evaluaters for the train dataset
+    # Calculate error evaluators for the train dataset
     error_class = basis_functionality.Error_Measures(y_train, resp_var_LR_train)
     MSE_train = error_class.mean_squared_error()
     R2_train = error_class.r2_score()
@@ -57,7 +54,7 @@ def perform_LR(input_x1, input_x2, obs_var, order, lam, train_frac):
     resp_var_LR_test = np.dot(D_test, beta_LR_train).reshape(y_test.shape[0], y_test.shape[1])
 
     # Step 4: Calculate errors
-    # Calculate error evaluaters for the test dataset
+    # Calculate error evaluators for the test dataset
     error_class = basis_functionality.Error_Measures(y_test, resp_var_LR_test)
     MSE_test = error_class.mean_squared_error()
     R2_test = error_class.r2_score()
@@ -100,7 +97,7 @@ def perform_LR_cross_val(input_x1, input_x2, obs_var, order, lam, num_fold=5):
 
         # Calculate beta and response variable for train dataset
         beta_LR_train, resp_var_LR_train = calculate_LR(x1_train, x2_train, y_train, order, lam=lam)
-        # Calculate error evaluaters for the train dataset
+        # Calculate error evaluators for the train dataset
         error_class = basis_functionality.Error_Measures(y_train, resp_var_LR_train)
 
         MSE_train[0, fold_index] = error_class.mean_squared_error()
@@ -112,7 +109,7 @@ def perform_LR_cross_val(input_x1, input_x2, obs_var, order, lam, num_fold=5):
         resp_var_LR_test = np.dot(D_test, beta_LR_train).reshape(y_test.shape[0], y_test.shape[1])
 
         # Step 4: Calculate errors for each fold
-        # Calculate error evaluaters for the test dataset
+        # Calculate error evaluators for the test dataset
         error_class = basis_functionality.Error_Measures(y_test, resp_var_LR_test)
         MSE_test[0, fold_index] = error_class.mean_squared_error()
         R2_test[0, fold_index] = error_class.r2_score()
@@ -151,12 +148,12 @@ def perform_LR_bootstrap(input_x1, input_x2, obs_var, order, lam, train_frac=0.8
     # Step 3: Calculate LR for bootstrap
     for boot_index in range(num_boot):
 
-        # Perform Boostrapping on training data
+        # Perform Bootstrapping on training data
         x1_train_boot, x2_train_boot, y_train_boot = prepare_data.bootstrap(x1_train, x2_train, y_train)
 
         # Calculate beta and response variable for train dataset
         beta_LR_train, resp_var_LR_train = calculate_LR(x1_train_boot, x2_train_boot, y_train_boot, order, lam=lam)
-        # Calculate error evaluaters for the train dataset
+        # Calculate error evaluators for the train dataset
         error_class = basis_functionality.Error_Measures(y_train_boot, resp_var_LR_train)
 
         MSE_train[0, boot_index] = error_class.mean_squared_error()
@@ -168,7 +165,7 @@ def perform_LR_bootstrap(input_x1, input_x2, obs_var, order, lam, train_frac=0.8
         resp_var_LR_test = np.dot(D_test, beta_LR_train).reshape(y_test.shape[0], y_test.shape[1])
 
         # Step 4: Calculate errors for each fold
-        # Calculate error evaluaters for the test dataset
+        # Calculate error evaluators for the test dataset
         error_class = basis_functionality.Error_Measures(y_test, resp_var_LR_test)
         MSE_test[0, boot_index] = error_class.mean_squared_error()
         R2_test[0, boot_index] = error_class.r2_score()

@@ -1,29 +1,23 @@
 """script to calculate ordinary least squares"""
 
-from regression_analysis.utils import create_data_franke
-from regression_analysis.utils import basis_functionality
-from regression_analysis.utils import create_plots
-from regression_analysis.utils import prepare_data
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
+from regression_analysis.utils import basis_functionality, create_data_franke, create_plots, prepare_data
 
 
-# To make results comparable set seed()
-np.random.seed(2021)
-
-
-def calculate_OLS(input_x1, input_x2, obs_var, order, D=None, beta_OLS=None):
+def calculate_OLS(input_x1, input_x2, obs_var, order, D=None):
     """Calculate the response variable for ordinary least squares."""
-    if not(D):
+    if not D:
         # Get design matrix
         regress_obj = basis_functionality.Design_Matrix_2D(input_x1, input_x2, obs_var, order)
         D = regress_obj.make_design_matrix()
-        A_inv = regress_obj.design_matrix_product_inverse()
 
-    if not(beta_OLS):
-        # Calculate parameter vector
-        beta_OLS = np.dot(np.dot(A_inv, D.T), obs_var.flatten())
+    # Calculate inverse
+    A_inv = regress_obj.design_matrix_product_inverse()
+
+    # Calculate parameter vector
+    beta_OLS = np.dot(np.dot(A_inv, D.T), obs_var.flatten())
 
     # Calculate response variable
     resp_var_OLS = np.dot(D, beta_OLS).reshape(obs_var.shape[0], obs_var.shape[1])

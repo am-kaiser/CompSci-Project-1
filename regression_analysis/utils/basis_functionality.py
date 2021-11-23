@@ -35,7 +35,8 @@ class Design_Matrix_2D:
 
         return D
 
-    def calculate_matrix_inverse(self, A):
+    @staticmethod
+    def calculate_matrix_inverse(A):
         """Calculate the inverse of a matrix."""
         # Decide which algorithm will be used to calculate the inverse
         # Note: The condition number of a matrix is a measure of how close the matrix is to being singular. A large

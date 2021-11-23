@@ -1,8 +1,9 @@
 """Unit test for the contents of regression_analysis.ridge_regression module."""
 
-from regression_analysis.fit_model import ridge_regression
 import numpy as np
 from sklearn import linear_model
+
+from regression_analysis.fit_model import ridge_regression
 
 
 def test_correct_beta():

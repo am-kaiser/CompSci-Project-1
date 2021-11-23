@@ -5,9 +5,11 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 
-def make_multi_line_plot(x, y, line_lab, fig=None, position=111, ylim=[-1, 1]):
+def make_multi_line_plot(x, y, line_lab, fig=None, position=111, ylim=None):
     """Make a figure with multiple lines but same values for x."""
-    if not(fig):
+    if ylim is None:
+        ylim = [-1, 1]
+    if fig is None:
         fig = plt.figure()
     ax = fig.add_subplot(position)
     num_lines = y.shape[0]
@@ -20,7 +22,7 @@ def make_multi_line_plot(x, y, line_lab, fig=None, position=111, ylim=[-1, 1]):
 def make_3d_surface_plot(x, y, z, title=None, fig=None, position=111, add_colorbar=True):
     """Create 3D surface plot of given input."""
     # Create figure and axes for plot
-    if not(fig):
+    if not fig:
         fig = plt.figure()
     ax = fig.add_subplot(position, projection='3d')
     # Plot the surface.
