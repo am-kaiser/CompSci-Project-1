@@ -74,9 +74,9 @@ class Error_Measures:
 
     def r2_score(self):
         """Calculate R2 score"""
-        oben = len(self.observed_values)*self.mean_squared_error()
-        unten = np.sum((self.observed_values - np.mean(self.model_values))**2)
-        R2 = 1 - (oben/unten)
+        numerator = np.sum((self.observed_values - self.model_values)**2)
+        denominator = np.sum((self.observed_values - np.mean(self.observed_values))**2)
+        R2 = 1 - (numerator/denominator)
         return R2
 
     def variance(self):
