@@ -119,7 +119,7 @@ class linear_regression2D():
             y_model_test = lasso_reg.fit(np.array(design_mat2D(x1_test, x2_test, order)))
         """
         if scikit_lasso:
-            lasso_reg = linear_model.Lasso(lmbda, fit_intercept=False)
+            lasso_reg = linear_model.Lasso(alpha=lmbda, fit_intercept=False)
             lasso_reg.fit(X, y_train)
             y_model_train = lasso_reg.predict(X)
             y_model_test = lasso_reg.predict(np.array(design_mat2D(x1_test, x2_test, order)))
