@@ -47,6 +47,3 @@ if __name__ == "__main__":
                                                  lam=90)"""
     beta_OLS = stochastic_gradient_descent_method(gradient=gradient_RR_OLS, y=obs_var.flatten(), D=design_matrix,
                                                   start=start_vec, num_epoch=1, learn_rate=0.1, num_min_batch=1, lam=0)
-
-    print(beta_OLS)
-    print(beta_RR)
