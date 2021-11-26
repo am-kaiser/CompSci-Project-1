@@ -1,8 +1,8 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 import findStat
-import sampling
+from regression_analysis.utils import sampling
+
 
 def poly_powers2D(order):
     x1pow = [0]

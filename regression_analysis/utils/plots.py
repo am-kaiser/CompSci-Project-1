@@ -1,9 +1,10 @@
 from matplotlib.tri import Triangulation
 import numpy as np
 
-#  this plot is based on stackover flow answer by user JohanC to the question in the link 
+
+#  this plot is based on stack overflow answer by user JohanC to the question in the link
 # https://stackoverflow.com/questions/66048529/how-to-create-a-heatmap-where-each-cell-is-divided-into-4-triangles
-def triangulation_for_triheatmap(M, N): #M and N are number of independent variables in x and y direction
+def triangulation_for_triheatmap(M, N):  # M and N are number of independent variables in x and y direction
     xv, yv = np.meshgrid(np.arange(-0.5, M), np.arange(-0.5, N))  # vertices of the little squares
     xc, yc = np.meshgrid(np.arange(0, M), np.arange(0, N))  # centers of the little squares
     x = np.concatenate([xv.ravel(), xc.ravel()])

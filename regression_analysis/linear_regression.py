@@ -1,8 +1,7 @@
 import numpy as np
-from numpy import random as npr
 import findStat
 from sklearn.model_selection import train_test_split
-import sampling
+from regression_analysis.utils import sampling
 from sklearn import linear_model
 
 
