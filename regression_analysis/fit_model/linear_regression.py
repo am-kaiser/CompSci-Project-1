@@ -1,23 +1,25 @@
 import numpy as np
-from sklearn.model_selection import train_test_split
-from regression_analysis.utils import sampling, findStat
 from sklearn import linear_model
+from sklearn.model_selection import train_test_split
+
+from regression_analysis.utils import sampling, findStat
 
 
 def poly_powers2D(order):
     """
-    determines the array of powers of the two dependent variables 
+    determines the array of powers of the two dependent variables
     for a 2D polynomial
     input: order of 2D polynomial
     output: arrays with powers for both dependent variables
     """
     x1pow = [0]
     x2pow = [0]
-    for i in np.arange(1,order+1):
-        for j in np.arange(0,i+1):
+    for i in np.arange(1, order + 1):
+        for j in np.arange(0, i + 1):
             x1pow.append(j)
-            x2pow.append(i-j)
+            x2pow.append(i - j)
     return x1pow, x2pow
+
 
 def design_mat2D(x1, x2, order):
     """
@@ -29,8 +31,9 @@ def design_mat2D(x1, x2, order):
     n = np.size(x1)
     design_mat = np.zeros((n, len(x1pow)))
     for term in range(len(x1pow)):
-        design_mat[:, term] = (x1**x1pow[term])*(x2**x2pow[term])
+        design_mat[:, term] = (x1 ** x1pow[term]) * (x2 ** x2pow[term])
     return design_mat
+
 
 def find_ols_params(X, y_train):
     """
@@ -38,7 +41,8 @@ def find_ols_params(X, y_train):
     Input: Design matrix, training output
     output: beta
     """
-    return np.linalg.pinv(X.T@X)@X.T@y_train #beta
+    return np.linalg.pinv(X.T @ X) @ X.T @ y_train  # beta
+
 
 def find_ridge_params(X, y_train, lmbda):
     """
@@ -46,8 +50,9 @@ def find_ridge_params(X, y_train, lmbda):
     Input: Design matrix, training output, lambda
     output: beta
     """
-    I = np.eye(X.shape[1], X.shape[1])
-    return np.linalg.pinv(X.T@X+lmbda*I)@X.T@y_train #beta
+    identity = np.eye(X.shape[1], X.shape[1])
+    return np.linalg.pinv(X.T @ X + lmbda * identity) @ X.T @ y_train  # beta
+
 
 class linear_regression2D():
     def __init__(self, x1, x2, y, **kwargs):
@@ -55,15 +60,15 @@ class linear_regression2D():
         initialise data for regression
         """
         self.n_points = y.shape[0]
-        #fixing data dimensions
-        if(len(x1.shape)==1 or len(x1.shape)==1 or len(x1.shape)==1):
+        # fixing data dimensions
+        if (len(x1.shape) == 1 or len(x1.shape) == 1 or len(x1.shape) == 1):
             x1 = x1.reshape(self.n_points, 1)
             x2 = x2.reshape(self.n_points, 1)
             y = y.reshape(self.n_points, 1)
 
-        self.x1 = x1 #input 2Ddata
+        self.x1 = x1  # input 2Ddata
         self.x2 = x2
-        self.y = y #output
+        self.y = y  # output
         self.n_points = y.shape[0]
         self.trainMSE = np.nan
         self.trainR2 = np.nan
@@ -74,8 +79,8 @@ class linear_regression2D():
         self.trainvar = np.nan
         self.testvar = np.nan
 
-        #scaling data using mix max scaling
-        self.y = (self.y-np.min(self.y))/(np.max(self.y)-np.min(self.y))
+        # scaling data using mix max scaling
+        self.y = (self.y - np.min(self.y)) / (np.max(self.y) - np.min(self.y))
 
     def apply_leastsquares(self, order=3, test_ratio=0.1, ridge=False, scikit_lasso=False, lmbda=0.1):
         """
@@ -84,9 +89,10 @@ class linear_regression2D():
         optional inputs: "ridge" -> if True, performs ridge regression with
         lambda = lmbda
         """
-        if(test_ratio!=0.0):
-            x_train, x_test, y_train, y_test = train_test_split(np.hstack([self.x1, self.x2]), self.y, test_size=test_ratio)
-            
+        if (test_ratio != 0.0):
+            x_train, x_test, y_train, y_test = train_test_split(np.hstack([self.x1, self.x2]), self.y,
+                                                                test_size=test_ratio)
+
             x1_train = x_train[:, 0]
             x2_train = x_train[:, 1]
 
@@ -100,11 +106,10 @@ class linear_regression2D():
             y_train = self.y
             y_test = np.array([])
 
-
-        #find train design matrix
+        # find train design matrix
         X = design_mat2D(x1_train, x2_train, order)
 
-        #finding model parameters
+        # finding model parameters
         """
         if not (ridge and scikit_lasso):
             beta = find_ols_params(X, y_train)
@@ -128,22 +133,20 @@ class linear_regression2D():
             beta = find_ols_params(X, y_train)
 
         if not scikit_lasso:
-            y_model_train = np.array(X @ beta) #fitting training data
-            
-            
+            y_model_train = np.array(X @ beta)  # fitting training data
+
         self.trainMSE = findStat.findMSE(y_train, y_model_train)
         self.trainR2 = findStat.findR2(y_train, y_model_train)
         self.trainbias = findStat.findBias(y_train, y_model_train)
         self.trainvar = findStat.findModelVar(y_model_train)
-        
-        if(test_ratio!=0.0):
+
+        if (test_ratio != 0.0):
             if not scikit_lasso:
-                y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta) #fitting testing data
+                y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)  # fitting testing data
             self.testMSE = findStat.findMSE(y_test, y_model_test)
             self.testR2 = findStat.findR2(y_test, y_model_test)
             self.testbias = findStat.findBias(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
-
 
     def apply_leastsquares_bootstrap(self, order=3, test_ratio=0.1, n_boots=10, ridge=False, lmbda=0.1):
         """
@@ -154,23 +157,24 @@ class linear_regression2D():
         """
         [self.trainMSE, self.trainR2, self.testMSE, self.testR2] = [0.0, 0.0, 0.0, 0.0]
         for run in range(n_boots):
-            x_train, x_test, y_train, y_test = sampling.bootstrap(np.hstack([self.x1, self.x2]), self.y, sample_ratio=test_ratio)
+            x_train, x_test, y_train, y_test = sampling.bootstrap(np.hstack([self.x1, self.x2]), self.y,
+                                                                  sample_ratio=test_ratio)
             x1_train = x_train[:, 0]
             x2_train = x_train[:, 1]
 
             x1_test = x_test[:, 0]
             x2_test = x_test[:, 1]
 
-            #find train design matrix
+            # find train design matrix
             X = design_mat2D(x1_train, x2_train, order)
-            #finding model parameters
+            # finding model parameters
             if not ridge:
                 beta = find_ols_params(X, y_train)
             elif ridge:
                 beta = find_ridge_params(X, y_train, lmbda)
 
-            y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta) #fitting testing data
-            y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta) #fitting training data
+            y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)  # fitting testing data
+            y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta)  # fitting training data
 
             self.trainMSE += findStat.findMSE(y_train, y_model_train)
             self.trainR2 += findStat.findR2(y_train, y_model_train)
@@ -198,7 +202,8 @@ class linear_regression2D():
         """
         [self.trainMSE, self.trainR2, self.testMSE, self.testR2] = [0.0, 0.0, 0.0, 0.0]
 
-        x_train_arr, x_test_arr, y_train_arr, y_test_arr = sampling.crossvalidation(np.hstack([self.x1, self.x2]), self.y, kfolds)
+        x_train_arr, x_test_arr, y_train_arr, y_test_arr = sampling.crossvalidation(np.hstack([self.x1, self.x2]),
+                                                                                    self.y, kfolds)
 
         for k in np.arange(kfolds):
             x1_train = x_train_arr[k, :, 0]
@@ -207,19 +212,19 @@ class linear_regression2D():
             x1_test = x_test_arr[k, :, 0]
             x2_test = x_test_arr[k, :, 1]
 
-            y_train = y_train_arr[k,:].reshape(len(y_train_arr[k,:]),1)
-            y_test = y_test_arr[k,:].reshape(len(y_test_arr[k,:]),1)
+            y_train = y_train_arr[k, :].reshape(len(y_train_arr[k, :]), 1)
+            y_test = y_test_arr[k, :].reshape(len(y_test_arr[k, :]), 1)
 
-            #find train design matrix
+            # find train design matrix
             X = design_mat2D(x1_train, x2_train, order)
-            #finding model parameters
+            # finding model parameters
             if not ridge:
                 beta = find_ols_params(X, y_train)
             elif ridge:
                 beta = find_ridge_params(X, y_train, lmbda)
 
-            y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta) #fitting testing data
-            y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta) #fitting training data
+            y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)  # fitting testing data
+            y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta)  # fitting training data
 
             self.trainMSE += findStat.findMSE(y_train, y_model_train)
             self.trainR2 += findStat.findR2(y_train, y_model_train)
