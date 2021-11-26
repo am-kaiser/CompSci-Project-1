@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
-import findStat
-from regression_analysis.utils import sampling
+from regression_analysis.utils import sampling, findStat
 
 
 def poly_powers2D(order):

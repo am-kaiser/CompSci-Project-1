@@ -1,7 +1,6 @@
 import numpy as np
-import findStat
 from sklearn.model_selection import train_test_split
-from regression_analysis.utils import sampling
+from regression_analysis.utils import sampling, findStat
 from sklearn import linear_model
 
 
