@@ -13,7 +13,7 @@ if __name__ == '__main__':
     xx1 = xx1.reshape((n * n), 1)
     xx2 = xx2.reshape((n * n), 1)
 
-    y = franke.Franke(xx1, xx2, var=0)
+    y = franke.Franke(xx1, xx2, noise_var=0)
     print(y.shape)
 
     """
