@@ -6,6 +6,7 @@ def findMSE(y_data, y_fit):
         return np.nan #edge case for zero testing data
     return np.mean((y_data-y_fit)**2)
 
+
 def findR2(y_data, y_fit):
     if(len(y_data)==0):
         return np.nan #edge case for zero testing data
