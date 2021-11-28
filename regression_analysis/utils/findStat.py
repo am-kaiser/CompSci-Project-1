@@ -9,6 +9,8 @@ def findMSE(y_data, y_fit):
 
 
 def findR2(y_data, y_fit):
+    y_data = y_data.flatten()
+    y_fit = y_fit.flatten()
     if len(y_data) == 0:
         return np.nan  # edge case for zero testing data
     num = np.sum((y_data - y_fit) ** 2)
