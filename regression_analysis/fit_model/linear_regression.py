@@ -85,15 +85,15 @@ class linear_regression2D():
     def __init__(self, x1, x2, y, **kwargs):
         """Initialise data for regression"""
         self.n_points = y.shape[0]
-        # fixing data dimensions
+        # Fixing data dimensions
         if len(x1.shape) == 1 or len(x1.shape) == 1 or len(x1.shape) == 1:
             x1 = x1.reshape(self.n_points, 1)
             x2 = x2.reshape(self.n_points, 1)
             y = y.reshape(self.n_points, 1)
 
-        self.x1 = x1  # input 2Ddata
+        self.x1 = x1  # input 2D data
         self.x2 = x2
-        self.y = y  # output
+        self.y = y
         self.n_points = y.shape[0]
         self.trainMSE = np.nan
         self.trainR2 = np.nan
@@ -140,7 +140,7 @@ class linear_regression2D():
         beta = find_model_parameter(X, y_train, reg_method, lmbda)
         # Fit training data
         y_model_train = np.array(X @ beta)
-
+        # Calculate error statistics for training data
         self.trainMSE = findStat.findMSE(y_train, y_model_train)
         self.trainR2 = findStat.findR2(y_train, y_model_train)
         self.trainbias = findStat.findBias(y_train, y_model_train)
@@ -149,7 +149,7 @@ class linear_regression2D():
         if test_ratio != 0.0:
             # Fit model to testing data
             y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)
-            # Calculate error statistics
+            # Calculate error statistics for testing data
             self.testMSE = findStat.findMSE(y_test, y_model_test)
             self.testR2 = findStat.findR2(y_test, y_model_test)
             self.testbias = findStat.findBias(y_test, y_model_test)
@@ -191,6 +191,7 @@ class linear_regression2D():
             self.trainvar = findStat.findModelVar(y_model_train)
             self.testbias = findStat.findBias(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
+        # Calculate mean of each error statistic
         self.trainMSE /= n_boots
         self.testMSE /= n_boots
         self.trainR2 /= n_boots
@@ -229,10 +230,10 @@ class linear_regression2D():
             X = design_mat2D(x1_train, x2_train, order)
             # finding model parameters
             beta = find_model_parameter(X, y_train, reg_method, lmbda)
-
-            y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)  # fitting testing data
-            y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta)  # fitting training data
-
+            # Fit model for test and train data
+            y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)
+            y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta)
+            # Calculate error statistics
             self.trainMSE += findStat.findMSE(y_train, y_model_train)
             self.trainR2 += findStat.findR2(y_train, y_model_train)
             self.testMSE += findStat.findMSE(y_test, y_model_test)
@@ -241,6 +242,7 @@ class linear_regression2D():
             self.trainvar = findStat.findModelVar(y_model_train)
             self.testbias = findStat.findBias(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
+        # Calculate mean of each error statistic
         self.trainMSE /= kfolds
         self.testMSE /= kfolds
         self.trainR2 /= kfolds
