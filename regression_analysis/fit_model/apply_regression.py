@@ -32,7 +32,6 @@ def apply_regression(order, num_points, noise_var, test_ratio_array=np.zeros(1),
     test_var_arr = np.zeros([len(order), len(num_points), len(noise_var), 
                                 len(test_ratio_array), len(ridge_lambda), len(lasso_lambda), 
                                 len(n_boots), len(k_folds)])
-
     # Calculate statistical indicators for given regression type and different resampling methods
     for points_ind in range(len(num_points)):
         for noise_ind in range(len(noise_var)):
@@ -111,7 +110,7 @@ def apply_regression(order, num_points, noise_var, test_ratio_array=np.zeros(1),
                                 test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind] = linear_reg.testvar
 
                     elif reg_type == "lasso":
-                        for lasso_lam_ind in range(len(ridge_lambda)):
+                        for lasso_lam_ind in range(len(lasso_lambda)):
                             linear_reg.apply_leastsquares(order=order[order_ind], test_ratio=test_ratio_array[ratio_ind], reg_method="scikit_lasso",
                                                           lmbda=lasso_lambda[lasso_lam_ind])
                             train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0] = linear_reg.trainMSE
@@ -183,6 +182,7 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
     :param n_boot: number of times bootstrap is performed if method=*_bootstrap
     :param k_fold: number of folds for cross-validation if method=*_crossvalidation
     :param ridge_lmb: lambda for ridge regression
+    :param lasso_lmb: lambda for lasso regression
     """
     # Path to example data
     data_path = get_data_path()
@@ -246,5 +246,5 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
 
 if __name__ == "__main__":
     # Plot one heatmap as an example
-    plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_fold=1000, ridge_lmb=122.0)
+    plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_fold=1000, ridge_lmb=122.0, lasso_lmb=112.0)
     plt.show()
