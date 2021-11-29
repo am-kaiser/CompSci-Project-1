@@ -82,7 +82,7 @@ class linear_regression2D():
         # scaling data using mix max scaling
         self.y = (self.y - np.min(self.y)) / (np.max(self.y) - np.min(self.y))
 
-    def apply_leastsquares(self, order=3, test_ratio=0.1, ridge=False, scikit_lasso=False, lmbda=0.1):
+    def apply_leastsquares(self, order=3, test_ratio=0.1, reg_method="ols", lmbda=0.1):
         """
         performs least squares
         input: order of polynomial, test ratio
@@ -110,29 +110,18 @@ class linear_regression2D():
         X = design_mat2D(x1_train, x2_train, order)
 
         # finding model parameters
-        """
-        if not (ridge and scikit_lasso):
+        if reg_method == "ols":
             beta = find_ols_params(X, y_train)
-        elif ridge:
+        elif reg_method == "ridge":
             beta = find_ridge_params(X, y_train, lmbda)
-        else: #scikit_lasso
-            lasso_reg = linear_model.Lasso(lmbda)
-            lasso_reg.fit(X, y_train)
-            y_model_train = lasso_reg.fit(X)
-            y_model_test = lasso_reg.fit(np.array(design_mat2D(x1_test, x2_test, order)))
-        """
-        if scikit_lasso:
-            lasso_reg = linear_model.Lasso(alpha=lmbda, fit_intercept=False)
-            lasso_reg.fit(X, y_train)
-            y_model_train = lasso_reg.predict(X)
-            y_model_test = lasso_reg.predict(np.array(design_mat2D(x1_test, x2_test, order)))
-        elif ridge:
-            beta = find_ridge_params(X, y_train, lmbda)
-        else:
-            beta = find_ols_params(X, y_train)
-
-        if not scikit_lasso:
-            y_model_train = np.array(X @ beta)  # fitting training data
+        elif reg_method == "scikit_ols":
+            beta = linear_model.LinearRegression(fit_intercept=False).fit(X, y_train).coef_.T
+        elif reg_method == "scikit_ridge":
+            beta = linear_model.Ridge(alpha=lmbda, fit_intercept=False).fit(X, y_train).coef_.T
+        elif reg_method == "scikit_lasso":
+            beta = linear_model.Lasso(alpha=lmbda, fit_intercept=False).fit(X, y_train).coef_.T
+            
+        y_model_train = np.array(X @ beta)  # fitting training data
 
         self.trainMSE = findStat.findMSE(y_train, y_model_train)
         self.trainR2 = findStat.findR2(y_train, y_model_train)
@@ -140,14 +129,13 @@ class linear_regression2D():
         self.trainvar = findStat.findModelVar(y_model_train)
 
         if (test_ratio != 0.0):
-            if not scikit_lasso:
-                y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)  # fitting testing data
+            y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)  # fitting testing data
             self.testMSE = findStat.findMSE(y_test, y_model_test)
             self.testR2 = findStat.findR2(y_test, y_model_test)
             self.testbias = findStat.findBias(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
 
-    def apply_leastsquares_bootstrap(self, order=3, test_ratio=0.1, n_boots=10, ridge=False, lmbda=0.1):
+    def apply_leastsquares_bootstrap(self, order=3, test_ratio=0.1, n_boots=10, reg_method="ols", lmbda=0.1):
         """
         performs least squares with bootstrap sampling
         input: order of polynomial, test ratio, number of bootstraps
@@ -167,10 +155,16 @@ class linear_regression2D():
             # find train design matrix
             X = design_mat2D(x1_train, x2_train, order)
             # finding model parameters
-            if not ridge:
+            if reg_method == "ols":
                 beta = find_ols_params(X, y_train)
-            elif ridge:
+            elif reg_method == "ridge":
                 beta = find_ridge_params(X, y_train, lmbda)
+            elif reg_method == "scikit_ols":
+                beta = linear_model.LinearRegression(fit_intercept=False).fit(X, y_train).coef_.T
+            elif reg_method == "scikit_ridge":
+                beta = linear_model.Ridge(alpha=lmbda, fit_intercept=False).fit(X, y_train).coef_.T
+            elif reg_method == "scikit_lasso":
+                beta = linear_model.Lasso(alpha=lmbda, fit_intercept=False).fit(X, y_train).coef_.T
 
             y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)  # fitting testing data
             y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta)  # fitting training data
@@ -192,7 +186,7 @@ class linear_regression2D():
         self.trainvar /= n_boots
         self.testvar /= n_boots
 
-    def apply_leastsquares_crossvalidation(self, order=3, kfolds=10, ridge=False, lmbda=0.1):
+    def apply_leastsquares_crossvalidation(self, order=3, kfolds=10, reg_method="ols", lmbda=0.1):
         """
         performs least squares with k fold cross validation sampling
         input: order of polynomial, test ratio, number of folds
@@ -217,10 +211,16 @@ class linear_regression2D():
             # find train design matrix
             X = design_mat2D(x1_train, x2_train, order)
             # finding model parameters
-            if not ridge:
+            if reg_method == "ols":
                 beta = find_ols_params(X, y_train)
-            elif ridge:
+            elif reg_method == "ridge":
                 beta = find_ridge_params(X, y_train, lmbda)
+            elif reg_method == "scikit_ols":
+                beta = linear_model.LinearRegression(fit_intercept=False).fit(X, y_train).coef_
+            elif reg_method == "scikit_ridge":
+                beta = linear_model.Ridge(alpha=lmbda, fit_intercept=False).fit(X, y_train).coef_
+            elif reg_method == "scikit_lasso":
+                beta = linear_model.Lasso(alpha=lmbda, fit_intercept=False).fit(X, y_train).coef_
 
             y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)  # fitting testing data
             y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta)  # fitting training data
