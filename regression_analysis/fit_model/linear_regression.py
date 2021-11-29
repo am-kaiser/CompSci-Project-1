@@ -1,3 +1,4 @@
+"""Scripts to perform fitting different least square methods to resampled data."""
 import numpy as np
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
@@ -7,10 +8,9 @@ from regression_analysis.utils import sampling, findStat
 
 def poly_powers2D(order):
     """
-    determines the array of powers of the two dependent variables
-    for a 2D polynomial
-    input: order of 2D polynomial
-    output: arrays with powers for both dependent variables
+    Determines the array of powers of the two dependent variables for a 2D polynomial.
+    :param order: order of polynomial to be fitted
+    :return: arrays with powers for both dependent variables
     """
     x1pow = [0]
     x2pow = [0]
@@ -23,9 +23,11 @@ def poly_powers2D(order):
 
 def design_mat2D(x1, x2, order):
     """
-    Generate design matrix for 2D Least Squares
-    input: arrays of input features, order of polynomial
-    output: design matrix
+    Generate design matrix for 2D least squares.
+    :param x1: array of input features
+    :param x2: array of input features
+    :param order: order of polynomial to be fitted
+    :return: design matrix
     """
     x1pow, x2pow = poly_powers2D(order)
     n = np.size(x1)
@@ -37,24 +39,35 @@ def design_mat2D(x1, x2, order):
 
 def find_ols_params(X, y_train):
     """
-    find beta aka parameters for ordinary least squares
-    Input: Design matrix, training output
-    output: beta
+    Find beta aka parameters for ordinary least squares.
+    :param X: design matrix
+    :param y_train: y from training data
+    :return: beta/ parameters
     """
-    return np.linalg.pinv(X.T @ X) @ X.T @ y_train  # beta
+    return np.linalg.pinv(X.T @ X) @ X.T @ y_train
 
 
 def find_ridge_params(X, y_train, lmbda):
     """
-    find beta aka parameters for ridge least squares
-    Input: Design matrix, training output, lambda
-    output: beta
+    Find beta aka parameters for ridge regression.
+    :param X: design matrix
+    :param y_train: y from training data
+    :param lmbda: lambda for ridge or lasso regression
+    :return: beta/ parameters
     """
     identity = np.eye(X.shape[1], X.shape[1])
-    return np.linalg.pinv(X.T @ X + lmbda * identity) @ X.T @ y_train  # beta
+    return np.linalg.pinv(X.T @ X + lmbda * identity) @ X.T @ y_train
 
 
 def find_model_parameter(design_matrix, y_input, method, lam):
+    """
+    Calculate beta for given method.
+    :param design_matrix: design matrix
+    :param y_input: y from training data
+    :param method: fitting method to be used
+    :param lam: lambda for ridge or lasso regression
+    :return: beta/ parameters
+    """
     if method == "ols":
         parameter = find_ols_params(design_matrix, y_input)
     elif method == "ridge":
@@ -62,7 +75,7 @@ def find_model_parameter(design_matrix, y_input, method, lam):
     elif method == "scikit_ols":
         parameter = linear_model.LinearRegression(fit_intercept=False).fit(design_matrix, y_input).coef_.T
     elif method == "scikit_ridge":
-        beta = linear_model.Ridge(alpha=lam, fit_intercept=False).fit(design_matrix, y_input).coef_.T
+        parameter = linear_model.Ridge(alpha=lam, fit_intercept=False).fit(design_matrix, y_input).coef_.T
     elif method == "scikit_lasso":
         parameter = linear_model.Lasso(alpha=lam, fit_intercept=False).fit(design_matrix, y_input).coef_.T
     return parameter
@@ -70,19 +83,17 @@ def find_model_parameter(design_matrix, y_input, method, lam):
 
 class linear_regression2D():
     def __init__(self, x1, x2, y, **kwargs):
-        """
-        initialise data for regression
-        """
+        """Initialise data for regression"""
         self.n_points = y.shape[0]
-        # fixing data dimensions
-        if (len(x1.shape) == 1 or len(x1.shape) == 1 or len(x1.shape) == 1):
+        # Fixing data dimensions
+        if len(x1.shape) == 1 or len(x1.shape) == 1 or len(x1.shape) == 1:
             x1 = x1.reshape(self.n_points, 1)
             x2 = x2.reshape(self.n_points, 1)
             y = y.reshape(self.n_points, 1)
 
-        self.x1 = x1  # input 2Ddata
+        self.x1 = x1  # input 2D data
         self.x2 = x2
-        self.y = y  # output
+        self.y = y
         self.n_points = y.shape[0]
         self.trainMSE = np.nan
         self.trainR2 = np.nan
@@ -98,10 +109,12 @@ class linear_regression2D():
 
     def apply_leastsquares(self, order=3, test_ratio=0.1, reg_method="ols", lmbda=0.1):
         """
-        performs least squares
-        input: order of polynomial, test ratio
-        optional inputs: "ridge" -> if True, performs ridge regression with
-        lambda = lmbda
+        Performs least squares on training and testing data.
+        :param order: order of polynomial which will be fitted
+        :param test_ratio: size of testing data set
+        :param reg_method: fitting method to be used
+        :param lmbda: lambda for ridge or lasso regression
+        :return: MSE, R2, bias, variance for training and testing datasets
         """
         if test_ratio != 0.0:
             # Split data ind training and testing datasets
@@ -127,16 +140,16 @@ class linear_regression2D():
         beta = find_model_parameter(X, y_train, reg_method, lmbda)
         # Fit training data
         y_model_train = np.array(X @ beta)
-
+        # Calculate error statistics for training data
         self.trainMSE = findStat.findMSE(y_train, y_model_train)
         self.trainR2 = findStat.findR2(y_train, y_model_train)
         self.trainbias = findStat.findBias(y_train, y_model_train)
         self.trainvar = findStat.findModelVar(y_model_train)
 
         if test_ratio != 0.0:
-            # Fit to testing data
+            # Fit model to testing data
             y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)
-            # Calculate error statistics
+            # Calculate error statistics for testing data
             self.testMSE = findStat.findMSE(y_test, y_model_test)
             self.testR2 = findStat.findR2(y_test, y_model_test)
             self.testbias = findStat.findBias(y_test, y_model_test)
@@ -144,13 +157,13 @@ class linear_regression2D():
 
     def apply_leastsquares_bootstrap(self, order=3, test_ratio=0.1, n_boots=10, reg_method="ols", lmbda=0.1):
         """
-        Performs least squares with bootstrap sampling.
+        Performs least squares with bootstrap resampling.
         :param order: order of polynomial which will be fitted
         :param test_ratio: size of testing data set
         :param n_boots: number of bootstraps to be performed
-        :param reg_method: fitting method to be used 
-        optional inputs: "ridge" -> if True, performs ridge regression with
-        lambda = lmbda
+        :param reg_method: fitting method to be used
+        :param lmbda: lambda for ridge or lasso regression
+        :return: MSE, R2, bias, variance for training and testing datasets
         """
         [self.trainMSE, self.trainR2, self.testMSE, self.testR2] = [0.0, 0.0, 0.0, 0.0]
         for run in range(n_boots):
@@ -162,14 +175,14 @@ class linear_regression2D():
             x1_test = x_test[:, 0]
             x2_test = x_test[:, 1]
 
-            # find train design matrix
+            # Find train design matrix
             X = design_mat2D(x1_train, x2_train, order)
-            # finding model parameters
+            # Find model parameters
             beta = find_model_parameter(X, y_train, reg_method, lmbda)
-
-            y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)  # fitting testing data
-            y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta)  # fitting training data
-
+            # Fit model for test and train data
+            y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)
+            y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta)
+            # Calculate error statistics
             self.trainMSE += findStat.findMSE(y_train, y_model_train)
             self.trainR2 += findStat.findR2(y_train, y_model_train)
             self.testMSE += findStat.findMSE(y_test, y_model_test)
@@ -178,6 +191,7 @@ class linear_regression2D():
             self.trainvar = findStat.findModelVar(y_model_train)
             self.testbias = findStat.findBias(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
+        # Calculate mean of each error statistic
         self.trainMSE /= n_boots
         self.testMSE /= n_boots
         self.trainR2 /= n_boots
@@ -189,10 +203,13 @@ class linear_regression2D():
 
     def apply_leastsquares_crossvalidation(self, order=3, kfolds=10, reg_method="ols", lmbda=0.1):
         """
-        performs least squares with k fold cross validation sampling
-        input: order of polynomial, test ratio, number of folds
-        optional inputs: "ridge" -> if True, performs ridge regression with
-        lambda = lmbda
+        Perform least squares with k fold cross validation resampling.
+        :param order: order of polynomial which will be fitted
+        :param test_ratio: size of testing data set
+        :param kfolds: number of folds to be used with cross-validation
+        :param reg_method: fitting method to be used
+        :param lmbda: lambda for ridge or lasso regression
+        :return: MSE, R2, bias, variance for training and testing datasets
         """
         [self.trainMSE, self.trainR2, self.testMSE, self.testR2] = [0.0, 0.0, 0.0, 0.0]
 
@@ -213,10 +230,10 @@ class linear_regression2D():
             X = design_mat2D(x1_train, x2_train, order)
             # finding model parameters
             beta = find_model_parameter(X, y_train, reg_method, lmbda)
-
-            y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)  # fitting testing data
-            y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta)  # fitting training data
-
+            # Fit model for test and train data
+            y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)
+            y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta)
+            # Calculate error statistics
             self.trainMSE += findStat.findMSE(y_train, y_model_train)
             self.trainR2 += findStat.findR2(y_train, y_model_train)
             self.testMSE += findStat.findMSE(y_test, y_model_test)
@@ -225,6 +242,7 @@ class linear_regression2D():
             self.trainvar = findStat.findModelVar(y_model_train)
             self.testbias = findStat.findBias(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
+        # Calculate mean of each error statistic
         self.trainMSE /= kfolds
         self.testMSE /= kfolds
         self.trainR2 /= kfolds
