@@ -154,7 +154,7 @@ def get_data_path():
     the execution in a jupyter notebook.
     """
     current_path = os.getcwd()
-    current_directory = current_path[current_path.rindex('/') + 1:]
+    current_directory = current_path[current_path.rindex(os.sep) + 1:]
     if current_directory == 'examples':
         data_path = 'data/'
     elif current_directory == 'regression_analysis':
