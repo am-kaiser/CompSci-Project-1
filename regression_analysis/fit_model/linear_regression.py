@@ -126,6 +126,7 @@ class linear_regression2D():
 
             x1_test = x_test[:, 0]
             x2_test = x_test[:, 1]
+
         else:
             x1_train = self.x1.flatten()
             x2_train = self.x2.flatten()
@@ -137,9 +138,11 @@ class linear_regression2D():
         # Find train design matrix
         X = design_mat2D(x1_train, x2_train, order)
         # Find model parameters
+
         beta = find_model_parameter(X, y_train, reg_method, lmbda)
         # Fit training data
         y_model_train = np.array(X @ beta)
+
         # Calculate error statistics for training data
         self.trainMSE = findStat.findMSE(y_train, y_model_train)
         self.trainR2 = findStat.findR2(y_train, y_model_train)
