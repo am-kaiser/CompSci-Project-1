@@ -86,7 +86,7 @@ class linear_regression2D():
         """Initialise data for regression"""
         self.n_points = y.shape[0]
         # Fixing data dimensions
-        if len(x1.shape) == 1 or len(x1.shape) == 1 or len(x1.shape) == 1:
+        if len(x1.shape) == 1 or len(x2.shape) == 1 or len(y.shape) == 1:
             x1 = x1.reshape(self.n_points, 1)
             x2 = x2.reshape(self.n_points, 1)
             y = y.reshape(self.n_points, 1)
@@ -251,3 +251,13 @@ class linear_regression2D():
         self.testbias /= kfolds
         self.trainvar /= kfolds
         self.testvar /= kfolds
+
+
+if __name__=="__main__":
+    from regression_analysis.utils import franke
+
+    x1, x2, y = franke.create_data(num_points=100, noise_variance=0)
+
+    model = linear_regression2D(x1, x2, y)
+    model.apply_leastsquares(order=5, test_ratio=0.1, reg_method="ols")
+
