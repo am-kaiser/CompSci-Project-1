@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def findMSE(y_data, y_fit):
     y_data = y_data.reshape(len(y_data), 1)
     y_fit = y_fit.reshape(len(y_data), 1)
