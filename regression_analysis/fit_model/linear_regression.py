@@ -155,8 +155,9 @@ class linear_regression2D():
             # Calculate error statistics for testing data
             self.testMSE = findStat.findMSE(y_test, y_model_test)
             self.testR2 = findStat.findR2(y_test, y_model_test)
-            self.testbias = findStat.findBias(y_test, y_model_test)
+            self.testbias = findStat.findBias4(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
+            #self.testbias = findStat.findBias3(y_train, y_test, y_model_train, y_model_test)
 
     def apply_leastsquares_bootstrap(self, order=3, test_ratio=0.1, n_boots=10, reg_method="ols", lmbda=0.1):
         """
