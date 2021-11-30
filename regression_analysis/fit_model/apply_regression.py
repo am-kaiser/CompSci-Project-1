@@ -33,17 +33,17 @@ def apply_regression(order, num_points, noise_var, test_ratio_array=np.zeros(1),
                                 len(test_ratio_array), len(ridge_lambda), len(lasso_lambda), 
                                 len(n_boots), len(k_folds)])
     # Calculate statistical indicators for given regression type and different resampling methods
-    for points_ind in range(len(num_points)):
-        for noise_ind in range(len(noise_var)):
+    for points_ind, num in enumerate(num_points):
+        for noise_ind, var in enumerate(noise_var):
             # Create data from Franke function
-            xx1, xx2, y = franke.create_data(num_points=num_points[points_ind], noise_variance=noise_var[noise_ind])
+            xx1, xx2, y = franke.create_data(num_points=num, noise_variance=var)
 
             linear_reg = linear_regression.linear_regression2D(xx1, xx2, y)
 
-            for order_ind in range(len(order)):
-                for ratio_ind in range(len(test_ratio_array)):
+            for order_ind, ordr in enumerate(order):
+                for ratio_ind, test_ratio in enumerate(test_ratio_array):
                     if reg_type == "ols":
-                        linear_reg.apply_leastsquares(order=order[order_ind], test_ratio=test_ratio_array[ratio_ind], reg_method="ols")
+                        linear_reg.apply_leastsquares(order=ordr, test_ratio=test_ratio, reg_method="ols")
                         train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0] = linear_reg.trainMSE
                         test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0] = linear_reg.testMSE
                         train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0] = linear_reg.trainR2
@@ -52,9 +52,9 @@ def apply_regression(order, num_points, noise_var, test_ratio_array=np.zeros(1),
                         test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0] = linear_reg.testvar
 
                     elif reg_type == "ols_bootstrap":
-                        for boot_ind in range(len(n_boots)):
-                            linear_reg.apply_leastsquares_bootstrap(order=order[order_ind], test_ratio=test_ratio_array[ratio_ind],
-                                                                    n_boots=n_boots[boot_ind], reg_method="ols")
+                        for boot_ind, n_boot in enumerate(n_boots):
+                            linear_reg.apply_leastsquares_bootstrap(order=ordr, test_ratio=test_ratio,
+                                                                    n_boots=n_boot, reg_method="ols")
                             train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0] = linear_reg.trainMSE
                             test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0] = linear_reg.testMSE
                             train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0] = linear_reg.trainR2
@@ -64,8 +64,8 @@ def apply_regression(order, num_points, noise_var, test_ratio_array=np.zeros(1),
 
                     elif reg_type == "ols_crossvalidation":
                         # note test_ratio_array is of length one for crossvalidation. we don't need test ratio
-                        for fold_ind in range(len(k_folds)):
-                            linear_reg.apply_leastsquares_crossvalidation(order=order[order_ind], kfolds=k_folds[fold_ind], reg_method="ols")
+                        for fold_ind, k_fold in enumerate(k_folds):
+                            linear_reg.apply_leastsquares_crossvalidation(order=ordr, kfolds=k_fold, reg_method="ols")
                             train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind] = linear_reg.trainMSE
                             test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind] = linear_reg.testMSE
                             train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind] = linear_reg.trainR2
@@ -74,9 +74,9 @@ def apply_regression(order, num_points, noise_var, test_ratio_array=np.zeros(1),
                             test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind] = linear_reg.testvar
 
                     elif reg_type == "ridge":
-                        for ridge_lam_ind in range(len(ridge_lambda)):
-                            linear_reg.apply_leastsquares(order=order[order_ind], test_ratio=test_ratio_array[ratio_ind], reg_method="ridge",
-                                                          lmbda=ridge_lambda[ridge_lam_ind])
+                        for ridge_lam_ind, ridge_lam in enumerate(ridge_lambda):
+                            linear_reg.apply_leastsquares(order=ordr, test_ratio=test_ratio, reg_method="ridge",
+                                                          lmbda=ridge_lam)
                             train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0] = linear_reg.trainMSE
                             test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0] = linear_reg.testMSE
                             train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0] = linear_reg.trainR2
@@ -85,11 +85,11 @@ def apply_regression(order, num_points, noise_var, test_ratio_array=np.zeros(1),
                             test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0] = linear_reg.testvar
 
                     elif reg_type == "ridge_bootstrap":
-                        for ridge_lam_ind in range(len(ridge_lambda)):
-                            for boot_ind in range(len(n_boots)):
-                                linear_reg.apply_leastsquares_bootstrap(order=order[order_ind], test_ratio=test_ratio_array[ratio_ind],
-                                                                        n_boots=n_boots[boot_ind], reg_method="ridge",
-                                                                        lmbda=ridge_lambda[ridge_lam_ind])
+                        for ridge_lam_ind, ridge_lam in enumerate(ridge_lambda):
+                            for boot_ind, n_boot in enumerate(n_boots):
+                                linear_reg.apply_leastsquares_bootstrap(order=ordr, test_ratio=test_ratio,
+                                                                        n_boots=n_boot, reg_method="ridge",
+                                                                        lmbda=ridge_lam)
                                 train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0] = linear_reg.trainMSE
                                 test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0] = linear_reg.testMSE
                                 train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0] = linear_reg.trainR2
@@ -98,10 +98,10 @@ def apply_regression(order, num_points, noise_var, test_ratio_array=np.zeros(1),
                                 test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0] = linear_reg.testvar
 
                     elif reg_type == "ridge_crossvalidation":
-                        for ridge_lam_ind in range(len(ridge_lambda)):
-                            for fold_ind in range(len(k_folds)):
-                                linear_reg.apply_leastsquares_crossvalidation(order=order[order_ind], kfolds=k_folds[fold_ind], reg_method="ridge",
-                                                                              lmbda=ridge_lambda[ridge_lam_ind])
+                        for ridge_lam_ind, ridge_lam in enumerate(ridge_lambda):
+                            for fold_ind, k_fold in enumerate(k_folds):
+                                linear_reg.apply_leastsquares_crossvalidation(order=ordr, kfolds=k_fold, reg_method="ridge",
+                                                                              lmbda=ridge_lam)
                                 train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind] = linear_reg.trainMSE
                                 test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind] = linear_reg.testMSE
                                 train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind] = linear_reg.trainR2
@@ -110,9 +110,9 @@ def apply_regression(order, num_points, noise_var, test_ratio_array=np.zeros(1),
                                 test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind] = linear_reg.testvar
 
                     elif reg_type == "lasso":
-                        for lasso_lam_ind in range(len(lasso_lambda)):
-                            linear_reg.apply_leastsquares(order=order[order_ind], test_ratio=test_ratio_array[ratio_ind], reg_method="scikit_lasso",
-                                                          lmbda=lasso_lambda[lasso_lam_ind])
+                        for lasso_lam_ind, lasso_lam in enumerate(lasso_lambda):
+                            linear_reg.apply_leastsquares(order=ordr, test_ratio=test_ratio, reg_method="scikit_lasso",
+                                                          lmbda=lasso_lam)
                             train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0] = linear_reg.trainMSE
                             test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0] = linear_reg.testMSE
                             train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0] = linear_reg.trainR2
@@ -121,11 +121,11 @@ def apply_regression(order, num_points, noise_var, test_ratio_array=np.zeros(1),
                             test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0] = linear_reg.testvar
 
                     elif reg_type == "lasso_bootstrap":
-                        for lasso_lam_ind in range(len(lasso_lambda)):
-                            for boot_ind in range(len(n_boots)):
-                                linear_reg.apply_leastsquares_bootstrap(order=order[order_ind], test_ratio=test_ratio_array[ratio_ind],
-                                                                        n_boots=n_boots[boot_ind], reg_method="scikit_lasso",
-                                                                        lmbda=lasso_lambda[lasso_lam_ind])
+                        for lasso_lam_ind, lasso_lam in enumerate(lasso_lambda):
+                            for boot_ind, n_boot in enumerate(n_boots):
+                                linear_reg.apply_leastsquares_bootstrap(order=ordr, test_ratio=test_ratio,
+                                                                        n_boots=n_boot, reg_method="scikit_lasso",
+                                                                        lmbda=lasso_lam)
                                 train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0] = linear_reg.trainMSE
                                 test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0] = linear_reg.testMSE
                                 train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0] = linear_reg.trainR2
@@ -134,10 +134,10 @@ def apply_regression(order, num_points, noise_var, test_ratio_array=np.zeros(1),
                                 test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0] = linear_reg.testvar
 
                     elif reg_type == "lasso_crossvalidation":
-                        for lasso_lam_ind in range(len(lasso_lambda)):
-                            for fold_ind in range(len(k_folds)):
-                                linear_reg.apply_leastsquares_crossvalidation(order=order[order_ind], kfolds=k_folds[fold_ind], reg_method="scikit_lasso",
-                                                                              lmbda=lasso_lambda[lasso_lam_ind])
+                        for lasso_lam_ind, lasso_lam in enumerate(lasso_lambda):
+                            for fold_ind, k_fold in enumerate(k_folds):
+                                linear_reg.apply_leastsquares_crossvalidation(order=ordr, kfolds=k_fold, reg_method="scikit_lasso",
+                                                                              lmbda=lasso_lam)
                                 train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind] = linear_reg.trainMSE
                                 test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind] = linear_reg.testMSE
                                 train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind] = linear_reg.trainR2
