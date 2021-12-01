@@ -156,7 +156,6 @@ class linear_regression2D():
         # Find train design matrix
         X = design_mat2D(x1_train, x2_train, order)
         # Find model parameters
-
         beta = find_model_parameter(X, y_train, reg_method, lmbda, num_epoch, learn_rate, num_min_batch)
         # Fit training data
         y_model_train = np.array(X @ beta)
