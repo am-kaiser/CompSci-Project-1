@@ -9,141 +9,137 @@ from regression_analysis.fit_model import linear_regression
 from regression_analysis.utils import franke
 
 
-def apply_regression(order, num_points, noise_var, test_ratio_array=np.zeros(1), reg_type="ols", ridge_lambda=np.ones(1),
-                     lasso_lambda=np.ones(1), n_boots=np.ones(1, dtype=int), k_folds=np.ones(1, dtype=int)):
+def create_0(order, num_points, noise_var, test_ratio, ridge_lambda, lasso_lambda, n_boots, k_folds, learn_rate, num_min_batch, epochs):
+    """Create array filled with zeros."""
+    return np.zeros([len(order), len(num_points), len(noise_var), len(test_ratio), len(ridge_lambda), len(lasso_lambda), len(n_boots),
+                     len(k_folds), len(learn_rate), len(num_min_batch), len(epochs)])
+
+
+def apply_regression(order, num_points, noise_var, test_ratio=np.zeros(1), reg_type="ols", ridge_lambda=np.ones(1),
+                     lasso_lambda=np.ones(1), n_boots=np.ones(1, dtype=int), k_folds=np.ones(1, dtype=int), learn_rate=np.ones(1),
+                     num_min_batch=np.ones(1), epochs=np.ones(1)):
     # applies regression for multiple parameter combos
-    train_MSE_arr = np.zeros([len(order), len(num_points), len(noise_var), 
-                                len(test_ratio_array), len(ridge_lambda), len(lasso_lambda), 
-                                len(n_boots), len(k_folds)])
-    test_MSE_arr = np.zeros([len(order), len(num_points), len(noise_var), 
-                                len(test_ratio_array), len(ridge_lambda), len(lasso_lambda), 
-                                len(n_boots), len(k_folds)])
-    train_R2_arr = np.zeros([len(order), len(num_points), len(noise_var), 
-                                len(test_ratio_array), len(ridge_lambda), len(lasso_lambda), 
-                                len(n_boots), len(k_folds)])
-    test_R2_arr = np.zeros([len(order), len(num_points), len(noise_var), 
-                                len(test_ratio_array), len(ridge_lambda), len(lasso_lambda), 
-                                len(n_boots), len(k_folds)])
+    train_MSE_arr = create_0(order, num_points, noise_var, test_ratio, ridge_lambda, lasso_lambda, n_boots, k_folds, learn_rate,
+                             num_min_batch, epochs)
+    test_MSE_arr = create_0(order, num_points, noise_var, test_ratio, ridge_lambda, lasso_lambda, n_boots, k_folds, learn_rate,
+                            num_min_batch, epochs)
+    train_R2_arr = create_0(order, num_points, noise_var, test_ratio, ridge_lambda, lasso_lambda, n_boots, k_folds, learn_rate,
+                            num_min_batch, epochs)
+    test_R2_arr = create_0(order, num_points, noise_var, test_ratio, ridge_lambda, lasso_lambda, n_boots, k_folds, learn_rate,
+                           num_min_batch, epochs)
     # bias in test set
-    test_bias_arr = np.zeros([len(order), len(num_points), len(noise_var), 
-                                len(test_ratio_array), len(ridge_lambda), len(lasso_lambda), 
-                                len(n_boots), len(k_folds)])
+    test_bias_arr = create_0(order, num_points, noise_var, test_ratio, ridge_lambda, lasso_lambda, n_boots, k_folds, learn_rate,
+                             num_min_batch, epochs)
     # variance in test set
-    test_var_arr = np.zeros([len(order), len(num_points), len(noise_var), 
-                                len(test_ratio_array), len(ridge_lambda), len(lasso_lambda), 
-                                len(n_boots), len(k_folds)])
+    test_var_arr = create_0(order, num_points, noise_var, test_ratio, ridge_lambda, lasso_lambda, n_boots, k_folds, learn_rate,
+                            num_min_batch, epochs)
+
     # Calculate statistical indicators for given regression type and different resampling methods
     for points_ind, num in enumerate(num_points):
         for noise_ind, var in enumerate(noise_var):
             # Create data from Franke function
             xx1, xx2, y = franke.create_data(num_points=num, noise_variance=var)
-
+            # Create regression object
             linear_reg = linear_regression.linear_regression2D(xx1, xx2, y)
 
             for order_ind, ordr in enumerate(order):
-                for ratio_ind, test_ratio in enumerate(test_ratio_array):
+                for ratio_ind, test_ratio in enumerate(test_ratio):
                     if reg_type == "ols":
                         linear_reg.apply_leastsquares(order=ordr, test_ratio=test_ratio, reg_method="ols")
-                        train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0] = linear_reg.trainMSE
-                        test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0] = linear_reg.testMSE
-                        train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0] = linear_reg.trainR2
-                        test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0] = linear_reg.testR2
-                        test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0] = linear_reg.testbias
-                        test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0] = linear_reg.testvar
+                        train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0, 0, 0, 0] = linear_reg.trainMSE
+                        test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0, 0, 0, 0] = linear_reg.testMSE
+                        train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0, 0, 0, 0] = linear_reg.trainR2
+                        test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0, 0, 0, 0] = linear_reg.testR2
+                        test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0, 0, 0, 0] = linear_reg.testbias
+                        test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, 0, 0, 0, 0] = linear_reg.testvar
 
                     elif reg_type == "ols_bootstrap":
                         for boot_ind, n_boot in enumerate(n_boots):
                             linear_reg.apply_leastsquares_bootstrap(order=ordr, test_ratio=test_ratio,
                                                                     n_boots=n_boot, reg_method="ols")
-                            train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0] = linear_reg.trainMSE
-                            test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0] = linear_reg.testMSE
-                            train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0] = linear_reg.trainR2
-                            test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0] = linear_reg.testR2
-                            test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0] = linear_reg.testbias
-                            test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0] = linear_reg.testvar
+                            train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0, 0, 0, 0] = linear_reg.trainMSE
+                            test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0, 0, 0, 0] = linear_reg.testMSE
+                            train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0, 0, 0, 0] = linear_reg.trainR2
+                            test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0, 0, 0, 0] = linear_reg.testR2
+                            test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0, 0, 0, 0] = linear_reg.testbias
+                            test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0, 0, 0, 0] = linear_reg.testvar
 
                     elif reg_type == "ols_crossvalidation":
-                        # note test_ratio_array is of length one for crossvalidation. we don't need test ratio
+                        # note test_ratio is of length one for crossvalidation. we don't need test ratio
                         for fold_ind, k_fold in enumerate(k_folds):
                             linear_reg.apply_leastsquares_crossvalidation(order=ordr, kfolds=k_fold, reg_method="ols")
-                            train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind] = linear_reg.trainMSE
-                            test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind] = linear_reg.testMSE
-                            train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind] = linear_reg.trainR2
-                            test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind] = linear_reg.testR2
-                            test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind] = linear_reg.testbias
-                            test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind] = linear_reg.testvar
+                            train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind, 0, 0, 0] = linear_reg.trainMSE
+                            test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind, 0, 0, 0] = linear_reg.testMSE
+                            train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind, 0, 0, 0] = linear_reg.trainR2
+                            test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind, 0, 0, 0] = linear_reg.testR2
+                            test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind, 0, 0, 0] = linear_reg.testbias
+                            test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, 0, fold_ind, 0, 0, 0] = linear_reg.testvar
 
                     elif reg_type == "ridge":
                         for ridge_lam_ind, ridge_lam in enumerate(ridge_lambda):
                             linear_reg.apply_leastsquares(order=ordr, test_ratio=test_ratio, reg_method="ridge",
                                                           lmbda=ridge_lam)
-                            train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0] = linear_reg.trainMSE
-                            test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0] = linear_reg.testMSE
-                            train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0] = linear_reg.trainR2
-                            test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0] = linear_reg.testR2
-                            test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0] = linear_reg.testbias
-                            test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0] = linear_reg.testvar
+                            train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0, 0, 0, 0] = linear_reg.trainMSE
+                            test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0, 0, 0, 0] = linear_reg.testMSE
+                            train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0, 0, 0, 0] = linear_reg.trainR2
+                            test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0, 0, 0, 0] = linear_reg.testR2
+                            test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0, 0, 0, 0] = linear_reg.testbias
+                            test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, 0, 0, 0, 0] = linear_reg.testvar
 
                     elif reg_type == "ridge_bootstrap":
                         for ridge_lam_ind, ridge_lam in enumerate(ridge_lambda):
                             for boot_ind, n_boot in enumerate(n_boots):
-                                linear_reg.apply_leastsquares_bootstrap(order=ordr, test_ratio=test_ratio,
-                                                                        n_boots=n_boot, reg_method="ridge",
-                                                                        lmbda=ridge_lam)
-                                train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0] = linear_reg.trainMSE
-                                test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0] = linear_reg.testMSE
-                                train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0] = linear_reg.trainR2
-                                test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0] = linear_reg.testR2
-                                test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0] = linear_reg.testbias
-                                test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0] = linear_reg.testvar
+                                linear_reg.apply_leastsquares_bootstrap(order=ordr, test_ratio=test_ratio, n_boots=n_boot, reg_method="ridge", lmbda=ridge_lam)
+                                train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0, 0, 0, 0] = linear_reg.trainMSE
+                                test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0, 0, 0, 0] = linear_reg.testMSE
+                                train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0, 0, 0, 0] = linear_reg.trainR2
+                                test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0, 0, 0, 0] = linear_reg.testR2
+                                test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0, 0, 0, 0] = linear_reg.testbias
+                                test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, boot_ind, 0, 0, 0, 0] = linear_reg.testvar
 
                     elif reg_type == "ridge_crossvalidation":
                         for ridge_lam_ind, ridge_lam in enumerate(ridge_lambda):
                             for fold_ind, k_fold in enumerate(k_folds):
-                                linear_reg.apply_leastsquares_crossvalidation(order=ordr, kfolds=k_fold, reg_method="ridge",
-                                                                              lmbda=ridge_lam)
-                                train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind] = linear_reg.trainMSE
-                                test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind] = linear_reg.testMSE
-                                train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind] = linear_reg.trainR2
-                                test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind] = linear_reg.testR2
-                                test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind] = linear_reg.testbias
-                                test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind] = linear_reg.testvar
+                                linear_reg.apply_leastsquares_crossvalidation(order=ordr, kfolds=k_fold, reg_method="ridge", lmbda=ridge_lam)
+                                train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind, 0, 0, 0] = linear_reg.trainMSE
+                                test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind, 0, 0, 0] = linear_reg.testMSE
+                                train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind, 0, 0, 0] = linear_reg.trainR2
+                                test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind, 0, 0, 0] = linear_reg.testR2
+                                test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind, 0, 0, 0] = linear_reg.testbias
+                                test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, ridge_lam_ind, 0, 0, fold_ind, 0, 0, 0] = linear_reg.testvar
 
                     elif reg_type == "lasso":
                         for lasso_lam_ind, lasso_lam in enumerate(lasso_lambda):
                             linear_reg.apply_leastsquares(order=ordr, test_ratio=test_ratio, reg_method="scikit_lasso",
                                                           lmbda=lasso_lam)
-                            train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0] = linear_reg.trainMSE
-                            test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0] = linear_reg.testMSE
-                            train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0] = linear_reg.trainR2
-                            test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0] = linear_reg.testR2
-                            test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0] = linear_reg.testbias
-                            test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0] = linear_reg.testvar
+                            train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0, 0, 0, 0] = linear_reg.trainMSE
+                            test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0, 0, 0, 0] = linear_reg.testMSE
+                            train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0, 0, 0, 0] = linear_reg.trainR2
+                            test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0, 0, 0, 0] = linear_reg.testR2
+                            test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0, 0, 0, 0] = linear_reg.testbias
+                            test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, 0, 0, 0, 0] = linear_reg.testvar
 
                     elif reg_type == "lasso_bootstrap":
                         for lasso_lam_ind, lasso_lam in enumerate(lasso_lambda):
                             for boot_ind, n_boot in enumerate(n_boots):
-                                linear_reg.apply_leastsquares_bootstrap(order=ordr, test_ratio=test_ratio,
-                                                                        n_boots=n_boot, reg_method="scikit_lasso",
-                                                                        lmbda=lasso_lam)
-                                train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0] = linear_reg.trainMSE
-                                test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0] = linear_reg.testMSE
-                                train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0] = linear_reg.trainR2
-                                test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0] = linear_reg.testR2
-                                test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0] = linear_reg.testbias
-                                test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0] = linear_reg.testvar
+                                linear_reg.apply_leastsquares_bootstrap(order=ordr, test_ratio=test_ratio, n_boots=n_boot, reg_method="scikit_lasso", lmbda=lasso_lam)
+                                train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0, 0, 0, 0] = linear_reg.trainMSE
+                                test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0, 0, 0, 0] = linear_reg.testMSE
+                                train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0, 0, 0, 0] = linear_reg.trainR2
+                                test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0, 0, 0, 0] = linear_reg.testR2
+                                test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0, 0, 0, 0] = linear_reg.testbias
+                                test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, boot_ind, 0, 0, 0, 0] = linear_reg.testvar
 
                     elif reg_type == "lasso_crossvalidation":
                         for lasso_lam_ind, lasso_lam in enumerate(lasso_lambda):
                             for fold_ind, k_fold in enumerate(k_folds):
-                                linear_reg.apply_leastsquares_crossvalidation(order=ordr, kfolds=k_fold, reg_method="scikit_lasso",
-                                                                              lmbda=lasso_lam)
-                                train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind] = linear_reg.trainMSE
-                                test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind] = linear_reg.testMSE
-                                train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind] = linear_reg.trainR2
-                                test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind] = linear_reg.testR2
-                                test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind] = linear_reg.testbias
-                                test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind] = linear_reg.testvar
+                                linear_reg.apply_leastsquares_crossvalidation(order=ordr, kfolds=k_fold, reg_method="scikit_lasso", lmbda=lasso_lam)
+                                train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind, 0, 0, 0] = linear_reg.trainMSE
+                                test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind, 0, 0, 0] = linear_reg.testMSE
+                                train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind, 0, 0, 0] = linear_reg.trainR2
+                                test_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind, 0, 0, 0] = linear_reg.testR2
+                                test_bias_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind, 0, 0, 0] = linear_reg.testbias
+                                test_var_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, lasso_lam_ind, 0, fold_ind, 0, 0, 0] = linear_reg.testvar
 
     return train_MSE_arr, test_MSE_arr, train_R2_arr, test_R2_arr, test_bias_arr, test_var_arr
 
@@ -190,7 +186,7 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
     order = np.load(data_path + "order.npy")
     num_points = np.load(data_path + "num_points.npy")
     noise_var = np.load(data_path + "noise_var.npy")
-    test_ratio_array = np.load(data_path + "test_ratio_array.npy")
+    test_ratio = np.load(data_path + "test_ratio.npy")
     ridge_lambda = np.load(data_path + "ridge_lambda.npy")
     k_folds = np.load(data_path + "k_folds.npy")
     n_boots = np.load(data_path + "n_boots.npy")
@@ -204,8 +200,8 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
         if num == num_points[i]:
             n_ind = i
     r_ind = 0
-    for i in range(len(test_ratio_array)):
-        if ratio == test_ratio_array[i]:
+    for i in range(len(test_ratio)):
+        if ratio == test_ratio[i]:
             r_ind = i
     rlambda_ind = 0
     for i in range(len(ridge_lambda)):
@@ -230,9 +226,9 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
         nb_ind = 0
     if method != "ols_crossvalidation" and method != "ridge_crossvalidation" and method != "lasso_crossvalidation":
         cv_ind = 0
-    if(method != "ridge" and method != "ridge_bootstrap" and method != "ridge_crossvalidation"):
+    if (method != "ridge" and method != "ridge_bootstrap" and method != "ridge_crossvalidation"):
         rlambda_ind = 0
-    if(method != "lasso" and method != "lasso_bootstrap" and method != "lasso_crossvalidation"):
+    if (method != "lasso" and method != "lasso_bootstrap" and method != "lasso_crossvalidation"):
         llambda_ind = 0
 
     # Select subset of data for given ratio, lambda, number of bootstraps and/or folds for cross-validation and plot
