@@ -135,7 +135,7 @@ class linear_regression2D():
         :return: MSE, R2, bias, variance for training and testing datasets
         """
         if test_ratio != 0.0:
-            # Split data ind training and testing datasets
+            # Split data in training and testing datasets
             x_train, x_test, y_train, y_test = train_test_split(np.hstack([self.x1, self.x2]), self.y,
                                                                 test_size=test_ratio)
 
@@ -174,7 +174,7 @@ class linear_regression2D():
             self.testR2 = findStat.findR2(y_test, y_model_test)
             self.testbias = findStat.findBias4(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
-            # self.testbias = findStat.findBias3(y_train, y_test, y_model_train, y_model_test)
+            self.testbias = findStat.findBias3(y_train, y_test, y_model_train, y_model_test)
 
     def apply_leastsquares_bootstrap(self, order=3, test_ratio=0.1, n_boots=10, reg_method="ols", lmbda=0.1, num_epoch=50, learn_rate=0.1,
                                      num_min_batch=5):
