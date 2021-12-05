@@ -17,6 +17,24 @@ def gradient_RR_OLS(y, X, beta, lmbda):
     return gradient
 
 
+def sigmoid_func(z):
+    return  1 / (1 + np.exp(z)) 
+
+
+def gradient_LR(y, X, beta, lmbda):
+    """
+    Define the gradient for logistic regression.
+    :params y: observed values
+    :params X: design matrix
+    :params beta: parameter vector/ regression coefficients
+    :params lmbda: L2 regularization parameter
+    :return: gradient of cost function
+    """
+    n = len(y)
+    gradient = (-1 / n) * X.T @ (y - sigmoid_func(X @ beta)) - lmbda*beta
+    return gradient
+
+
 def stochastic_gradient_descent_method(gradient, y, X, start, num_epoch, learn_rate, num_min_batch, lmbda):
     """
     Define gradient descent method to find optimal beta for given gradient.
