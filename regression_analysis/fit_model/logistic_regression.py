@@ -3,7 +3,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
+from sklearn import linear_model
 
 from regression_analysis.utils import stochastic_gradient_descent, findStat, sampling
 
@@ -17,9 +17,9 @@ def load_data(file_name='regression_analysis/examples/data_logistic_regression/d
 
 def design_matrix(data):
     """Create design matrix from data."""
+    data_val = data.drop(['id', 'diagnosis'], axis=1).values
     intercept = np.repeat(1, data.shape[0])
-    data['intercept'] = intercept
-    return data.drop(['id', 'diagnosis'], axis=1).values
+    return np.c_[intercept, data_val]
 
 
 def normalise_data(matrix):
@@ -46,7 +46,7 @@ def find_logistic_model_parameter(design_matrix, y_input, method, lam, num_epoch
                                                                                    num_epoch=num_epoch, learn_rate=learn_rate,
                                                                                    num_min_batch=num_min_batch, lmbda=lam)
     elif method == "logistic_scikit":
-        parameter=LogisticRegression(fit_intercept=False).fit(design_matrix, y_input).coef_.T #penalty???
+        parameter=linear_model.LogisticRegression(fit_intercept=False).fit(design_matrix, np.ravel(y_input)).coef_.T #penalty???
 
     return parameter
 
@@ -54,7 +54,7 @@ def find_logistic_model_parameter(design_matrix, y_input, method, lam, num_epoch
 class LogisticRegression:
     def __init__(self, X, y):
         self.X = X
-        self.y = y
+        self.y = y.reshape(y.shape[0], 1)
 
         self.trainMSE = np.nan
         self.trainR2 = np.nan
@@ -69,10 +69,10 @@ class LogisticRegression:
         if test_ratio != 0.0:
             # Split data in training and testing datasets
             x_train, x_test, y_train, y_test = train_test_split(self.X, self.y, test_size=test_ratio)
-            x_train = x_train.T
+            """x_train = x_train.T
             x_test = x_test.T
             y_train = y_train.T
-            y_test = y_test.T
+            y_test = y_test.T"""
         else:
             x_train = self.X
             x_test = np.array([])
@@ -98,9 +98,8 @@ class LogisticRegression:
             self.testR2 = findStat.findR2(y_test, y_model_test)
             self.testbias = findStat.findBias4(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
-            self.testbias = findStat.findBias3(y_train, y_test, y_model_train, y_model_test)
 
-    def apply_logistsic_regression_crossvalidation(self, kfolds=10, reg_method="logistic_sgd", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5):
+    def apply_logistic_regression_crossvalidation(self, kfolds=10, reg_method="logistic_sgd", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5):
         """
         Perform logistic regression with k fold cross validation resampling.
         :param order: order of polynomial which will be fitted
@@ -130,9 +129,9 @@ class LogisticRegression:
             self.trainR2 += findStat.findR2(y_train, y_model_train)
             self.testMSE += findStat.findMSE(y_test, y_model_test)
             self.testR2 += findStat.findR2(y_test, y_model_test)
-            self.trainbias = findStat.findBias(y_train, y_model_train)
+            self.trainbias = findStat.findBias4(y_train, y_model_train)
             self.trainvar = findStat.findModelVar(y_model_train)
-            self.testbias = findStat.findBias(y_test, y_model_test)
+            self.testbias = findStat.findBias4(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
         # Calculate mean of each error statistic
         self.trainMSE /= kfolds
@@ -146,7 +145,17 @@ class LogisticRegression:
 
 
 if __name__ == "__main__":
+
     input_data = load_data()
-    X_obs = normalise_data(design_matrix(input_data))
+    X_obs = normalise_data(design_matrix(input_data)) #Note when normalising first column no longer 1
     y_in = input_data.diagnosis.values
-    print(X_obs)
+
+    logistic_regression_object = LogisticRegression(X_obs, y_in)
+    logistic_regression_object.apply_logistic_regression(test_ratio=0.1, reg_method="logistic_sgd", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5)
+    print(logistic_regression_object.testMSE)
+    logistic_regression_object.apply_logistic_regression(test_ratio=0.1, reg_method="logistic_scikit", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5)
+    print(logistic_regression_object.testMSE)
+    logistic_regression_object.apply_logistic_regression_crossvalidation(kfolds=10, reg_method="logistic_sgd", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5)
+    print(logistic_regression_object.testMSE)
+    logistic_regression_object.apply_logistic_regression_crossvalidation(kfolds=10, reg_method="logistic_scikit", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5)
+    print(logistic_regression_object.testMSE)

@@ -48,7 +48,7 @@ def stochastic_gradient_descent_method(gradient, y, X, start, num_epoch, learn_r
     :params lmbda: When lam=0 it is OLS and otherwise ridge regression.
     :return: beta
     """
-    vector = start
+    vector = start.reshape(start.shape[0], 1)
     num_observations = X.shape[0]
     for _ in range(num_epoch):
         for _ in range(num_min_batch):
