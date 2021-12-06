@@ -7,7 +7,12 @@ def Franke(x1, x2, noise_var=0.0):
     b = 0.75 * np.exp(-((9 * x1 + 1) ** 2) / 49 - (9 * x2 + 1) / 10)
     c = 0.5 * np.exp(-((9 * x1 - 7) ** 2) / 4 - ((9 * x2 - 3) ** 2) / 4)
     d = 0.2 * np.exp(-((9 * x1 - 4) ** 2) - ((9 * x2 - 7) ** 2))
-    return a + b + c - d + npr.normal(loc=0, scale=noise_var)
+    e = npr.normal(loc=0, scale=noise_var, size=a.shape)
+    #note if we don't truncate the gaussian, we won't see the effect of the noise 
+    #as all noise will be rescaled to the range 0,1.
+    e[np.where(e>1.0)]=1.0
+    e[np.where(e<0.0)]=0.0
+    return a + b + c - d + e
 
 
 def create_data(num_points, noise_variance):

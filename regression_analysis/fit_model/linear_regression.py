@@ -105,7 +105,8 @@ class linear_regression2D():
         self.testvar = np.nan
 
         # scaling data using mix max scaling
-        self.y = (self.y - np.min(self.y)) / (np.max(self.y) - np.min(self.y))
+        self.y = (self.y - np.amin(self.y)) / (np.amax(self.y) - np.amin(self.y))
+        print(np.amax(self.y))
 
     def apply_leastsquares(self, order=3, test_ratio=0.1, reg_method="ols", lmbda=0.1):
         """
@@ -155,7 +156,7 @@ class linear_regression2D():
             # Calculate error statistics for testing data
             self.testMSE = findStat.findMSE(y_test, y_model_test)
             self.testR2 = findStat.findR2(y_test, y_model_test)
-            self.testbias = findStat.findBias4(y_test, y_model_test)
+            self.testbias = findStat.findBias(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
             #self.testbias = findStat.findBias3(y_train, y_test, y_model_train, y_model_test)
 
