@@ -1,9 +1,8 @@
 """Scripts to perform fitting different least square methods to resampled data."""
 import numpy as np
+from regression_analysis.utils import sampling, findStat, stochastic_gradient_descent
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
-
-from regression_analysis.utils import sampling, findStat, stochastic_gradient_descent
 
 
 def poly_powers2D(order):
@@ -212,10 +211,10 @@ class linear_regression2D():
             self.trainR2 += findStat.findR2(y_train, y_model_train)
             self.testMSE += findStat.findMSE(y_test, y_model_test)
             self.testR2 += findStat.findR2(y_test, y_model_test)
-            self.trainbias = findStat.findBias(y_train, y_model_train)
-            self.trainvar = findStat.findModelVar(y_model_train)
-            self.testbias = findStat.findBias(y_test, y_model_test)
-            self.testvar = findStat.findModelVar(y_model_test)
+            self.trainbias += findStat.findBias(y_train, y_model_train)
+            self.trainvar += findStat.findModelVar(y_model_train)
+            self.testbias += findStat.findBias(y_test, y_model_test)
+            self.testvar += findStat.findModelVar(y_model_test)
         # Calculate mean of each error statistic
         self.trainMSE /= n_boots
         self.testMSE /= n_boots

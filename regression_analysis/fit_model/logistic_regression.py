@@ -1,9 +1,9 @@
 """Script to perform logistic regression."""
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+from sklearn import linear_model, svm
 from sklearn.model_selection import train_test_split
-from sklearn import linear_model
 
 from regression_analysis.utils import stochastic_gradient_descent, findStat, sampling
 
@@ -46,9 +46,31 @@ def find_logistic_model_parameter(design_matrix, y_input, method, lam, num_epoch
                                                                                    num_epoch=num_epoch, learn_rate=learn_rate,
                                                                                    num_min_batch=num_min_batch, lmbda=lam)
     elif method == "logistic_scikit":
-        parameter=linear_model.LogisticRegression(fit_intercept=False).fit(design_matrix, np.ravel(y_input)).coef_.T #penalty???
-
+        parameter = linear_model.LogisticRegression(fit_intercept=False).fit(design_matrix, np.ravel(y_input)).coef_.T  # penalty???
+    elif method == "svm":
+        parameter = svm.SVC(kernel='linear').fit(design_matrix, np.ravel(y_input)).coef_.T
     return parameter
+
+
+def make_confusion_matrix(y_test, y_predict):
+    true_pos = np.count_nonzero((y_test == y_predict) & (y_test == 1))
+    true_neg = np.count_nonzero((y_test == y_predict) & (y_test == 0))
+    false_pos = np.count_nonzero((y_test != y_predict) & (y_test == 0))
+    false_neg = np.count_nonzero((y_test != y_predict) & (y_test == 1))
+
+    confusion_matrix = np.array([[true_pos, false_neg], [false_pos, true_neg]])
+
+    return pd.DataFrame(confusion_matrix, index=['is_malignant', 'is_benign'], columns=['predicted_malignent', 'predicted_benign'])
+
+
+def transform_0_1(values):
+    """Transform content of numpy array to either 0 or 1."""
+    for elem in range(values.shape[0]):
+        if values[elem, 0] <= 0.5:
+            values[elem, 0] = 0
+        else:
+            values[elem, 0] = 1
+    return values
 
 
 class LogisticRegression:
@@ -64,15 +86,12 @@ class LogisticRegression:
         self.testbias = np.nan
         self.trainvar = np.nan
         self.testvar = np.nan
+        self.confusion_matrix = pd.DataFrame()
 
     def apply_logistic_regression(self, test_ratio=0.1, reg_method="logistic_sgd", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5):
         if test_ratio != 0.0:
             # Split data in training and testing datasets
             x_train, x_test, y_train, y_test = train_test_split(self.X, self.y, test_size=test_ratio)
-            """x_train = x_train.T
-            x_test = x_test.T
-            y_train = y_train.T
-            y_test = y_test.T"""
         else:
             x_train = self.X
             x_test = np.array([])
@@ -83,7 +102,8 @@ class LogisticRegression:
         beta = find_logistic_model_parameter(x_train, y_train, reg_method, lmbda, num_epoch, learn_rate, num_min_batch)
         # Fit training data
         y_model_train = np.array(x_train @ beta)
-
+        # transform y_model_train to be either 0 or 1
+        y_model_train = transform_0_1(y_model_train)
         # Calculate error statistics for training data
         self.trainMSE = findStat.findMSE(y_train, y_model_train)
         self.trainR2 = findStat.findR2(y_train, y_model_train)
@@ -93,13 +113,18 @@ class LogisticRegression:
         if test_ratio != 0.0:
             # Fit model to testing data
             y_model_test = np.array(x_test @ beta)
+            # transform y_model_test to be either 0 or 1
+            y_model_test = transform_0_1(y_model_test)
             # Calculate error statistics for testing data
             self.testMSE = findStat.findMSE(y_test, y_model_test)
             self.testR2 = findStat.findR2(y_test, y_model_test)
             self.testbias = findStat.findBias4(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
+            # Calculate confusion matrix
+            self.confusion_matrix = make_confusion_matrix(y_test, y_model_test)
 
-    def apply_logistic_regression_crossvalidation(self, kfolds=10, reg_method="logistic_sgd", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5):
+    def apply_logistic_regression_crossvalidation(self, kfolds=10, reg_method="logistic_sgd", lmbda=0, num_epoch=50, learn_rate=0.1,
+                                                  num_min_batch=5):
         """
         Perform logistic regression with k fold cross validation resampling.
         :param order: order of polynomial which will be fitted
@@ -124,15 +149,21 @@ class LogisticRegression:
             # Fit model for test and train data
             y_model_test = np.array(x_test @ beta)
             y_model_train = np.array(x_train @ beta)
+            # transform y's to be either 0 or 1
+            y_model_test = transform_0_1(y_model_test)
+            y_model_train = transform_0_1(y_model_train)
             # Calculate error statistics
             self.trainMSE += findStat.findMSE(y_train, y_model_train)
             self.trainR2 += findStat.findR2(y_train, y_model_train)
             self.testMSE += findStat.findMSE(y_test, y_model_test)
             self.testR2 += findStat.findR2(y_test, y_model_test)
-            self.trainbias = findStat.findBias4(y_train, y_model_train)
-            self.trainvar = findStat.findModelVar(y_model_train)
-            self.testbias = findStat.findBias4(y_test, y_model_test)
-            self.testvar = findStat.findModelVar(y_model_test)
+            self.trainbias += findStat.findBias4(y_train, y_model_train)
+            self.trainvar += findStat.findModelVar(y_model_train)
+            self.testbias += findStat.findBias4(y_test, y_model_test)
+            self.testvar += findStat.findModelVar(y_model_test)
+            # Calculate confusion matrix
+            self.confusion_matrix = self.confusion_matrix.add(make_confusion_matrix(y_test, y_model_test), fill_value=0)
+
         # Calculate mean of each error statistic
         self.trainMSE /= kfolds
         self.testMSE /= kfolds
@@ -143,19 +174,37 @@ class LogisticRegression:
         self.trainvar /= kfolds
         self.testvar /= kfolds
 
+        self.confusion_matrix = (self.confusion_matrix / kfolds).round(0).astype('int')
+
 
 if __name__ == "__main__":
-
     input_data = load_data()
-    X_obs = normalise_data(design_matrix(input_data)) #Note when normalising first column no longer 1
+    X_obs = normalise_data(design_matrix(input_data))  # Note when normalising first column no longer 1
     y_in = input_data.diagnosis.values
 
     logistic_regression_object = LogisticRegression(X_obs, y_in)
-    logistic_regression_object.apply_logistic_regression(test_ratio=0.1, reg_method="logistic_sgd", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5)
+    logistic_regression_object.apply_logistic_regression(test_ratio=0.1, reg_method="logistic_sgd", lmbda=0, num_epoch=50,
+                                                         learn_rate=0.1, num_min_batch=5)
+    print(logistic_regression_object.confusion_matrix)
     print(logistic_regression_object.testMSE)
-    logistic_regression_object.apply_logistic_regression(test_ratio=0.1, reg_method="logistic_scikit", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5)
+
+    logistic_regression_object.apply_logistic_regression(test_ratio=0.1, reg_method="logistic_scikit")
+    print(logistic_regression_object.confusion_matrix)
     print(logistic_regression_object.testMSE)
-    logistic_regression_object.apply_logistic_regression_crossvalidation(kfolds=10, reg_method="logistic_sgd", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5)
+
+    logistic_regression_object.apply_logistic_regression_crossvalidation(kfolds=10, reg_method="logistic_sgd", lmbda=0, num_epoch=50,
+                                                                         learn_rate=0.1, num_min_batch=5)
+    print(logistic_regression_object.confusion_matrix)
     print(logistic_regression_object.testMSE)
-    logistic_regression_object.apply_logistic_regression_crossvalidation(kfolds=10, reg_method="logistic_scikit", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5)
+
+    logistic_regression_object.apply_logistic_regression_crossvalidation(kfolds=10, reg_method="logistic_scikit")
+    print(logistic_regression_object.confusion_matrix)
+    print(logistic_regression_object.testMSE)
+
+    logistic_regression_object.apply_logistic_regression(test_ratio=0.1, reg_method="svm")
+    print(logistic_regression_object.confusion_matrix)
+    print(logistic_regression_object.testMSE)
+
+    logistic_regression_object.apply_logistic_regression_crossvalidation(kfolds=10, reg_method="svm")
+    print(logistic_regression_object.confusion_matrix)
     print(logistic_regression_object.testMSE)
