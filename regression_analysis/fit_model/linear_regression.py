@@ -106,7 +106,6 @@ class linear_regression2D():
 
         # scaling data using mix max scaling
         self.y = (self.y - np.amin(self.y)) / (np.amax(self.y) - np.amin(self.y))
-        print(np.amax(self.y))
 
     def apply_leastsquares(self, order=3, test_ratio=0.1, reg_method="ols", lmbda=0.1):
         """
