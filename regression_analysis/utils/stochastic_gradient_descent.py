@@ -18,7 +18,7 @@ def gradient_RR_OLS(y, X, beta, lmbda):
 
 
 def sigmoid_func(z):
-    return  1 / (1 + np.exp(z)) 
+    return 1 / (1 + np.exp(-z))
 
 
 def gradient_LR(y, X, beta, lmbda):
@@ -30,8 +30,7 @@ def gradient_LR(y, X, beta, lmbda):
     :params lmbda: L2 regularization parameter
     :return: gradient of cost function
     """
-    n = len(y)
-    gradient = (-1 / n) * X.T @ (y - sigmoid_func(X @ beta)) - lmbda*beta
+    gradient = (-1) * X.T @ (y - sigmoid_func(X @ beta)) - lmbda*beta
     return gradient
 
 

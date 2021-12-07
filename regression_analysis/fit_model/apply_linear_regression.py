@@ -247,9 +247,10 @@ def get_data_statistic(data_path, statistic, method):
     return np.load(data_path + file_name)
 
 
-def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_fold=1000, ridge_lmb=122.0, lasso_lmb=112.2, learn_rate=0.1, batch=5, epoch=50):
-    """"
-    Create heatmap for given statistical indicator and sampling method.
+def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_fold=1000, ridge_lmb=122.0, lasso_lmb=112.2, learn_rate=0.1,
+              batch=5, epoch=50):
+    """
+    Create heatmap for given statistical indicator and sampling method
     :param ratio: ratio of the dataset to be used for testing
     :param num: length of dataset
     :param stat: statistical indicator
@@ -258,6 +259,9 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
     :param k_fold: number of folds for cross-validation if method=*_crossvalidation
     :param ridge_lmb: lambda for ridge regression
     :param lasso_lmb: lambda for lasso regression
+    :param epoch: number of epochs for stochastic gradient descent
+    :param learn_rate: learn rate for stochastic gradient descent
+    :param batch: number of mini batches for stochastic gradient descent
     """
     # Path to example data
     data_path = get_data_path()
