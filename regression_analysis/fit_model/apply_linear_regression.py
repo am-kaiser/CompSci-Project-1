@@ -279,7 +279,7 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
 
     # Load data for statistical indicator
     data = get_data_statistic(data_path, stat, method)
-    
+
     n_ind = 0
     for i in range(len(num_points)):
         if num == num_points[i]:

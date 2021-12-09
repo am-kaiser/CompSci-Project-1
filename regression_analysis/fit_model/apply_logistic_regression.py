@@ -117,5 +117,5 @@ def plot_accuracy(reg_type, l2_lambda, learn_rate, num_min_batch, epoch, test_ra
 
 
 if __name__ == "__main__":
-    plot_accuracy(reg_type="logistic_sgd", l2_lambda=0, learn_rate=[0,1,2,3], num_min_batch=4, epoch=5, test_ratio=0.1, k_fold=None)
+    plot_accuracy(reg_type="logistic_sgd", l2_lambda=0, learn_rate=[0, 1, 2, 3], num_min_batch=4, epoch=5, test_ratio=0.1, k_fold=None)
     plt.show()

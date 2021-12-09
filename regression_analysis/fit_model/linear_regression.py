@@ -58,16 +58,16 @@ def find_ridge_params(X, y_train, lmbda):
     return np.linalg.pinv(X.T @ X + lmbda * identity) @ X.T @ y_train
 
 
-def find_model_parameter(design_matrix, y_input, method, lam, num_epoch, learn_rate, num_min_batch):
+def find_model_parameter(design_matrix, y_input, method, lam, num_epoch=None, learn_rate=None, num_min_batch=None):
     """
-    Calculate beta for given method.
+    Calculate beta for given method
     :param design_matrix: design matrix
     :param y_input: y from training data
     :param method: fitting method to be used
     :param lam: lambda for ridge or lasso regression
-    :params num_epoch: number of epochs for stochastic gradient descent
-    :params learn_rate: learn rate for stochastic gradient descent
-    :params num_min_batch. number of mini batches for stochastic gradient descent
+    :param num_epoch: number of epochs for stochastic gradient descent
+    :param learn_rate: learn rate for stochastic gradient descent
+    :param num_min_batch. number of mini batches for stochastic gradient descent
     :return: beta/ parameters
     """
     if method == "ols":
