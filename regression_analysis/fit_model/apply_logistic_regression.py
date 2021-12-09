@@ -102,9 +102,17 @@ def plot_accuracy(reg_type, l2_lambda, learn_rate, num_min_batch, epoch, test_ra
         test_accr[rate_ind] = logistic_reg.test_accuracy
         train_accr[rate_ind] = logistic_reg.train_accuracy
 
+    # Get Scikit Accuracies
+    logistic_reg.apply_logistic_regression(test_ratio=test_ratio, reg_method="logistic_scikit")
+    test_accr_scikit = logistic_reg.test_accuracy
+    train_accr_scikit = logistic_reg.train_accuracy
+
+    # Make plot of accuracies
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
     ax1.plot(learn_rate, train_accr)
+    ax1.axhline(y=train_accr_scikit, color='r', linestyle='-')
     ax2.plot(learn_rate, test_accr)
+    ax2.axhline(y=test_accr_scikit, color='r', linestyle='-')
     ax1.title.set_text('Train Data')
     ax2.title.set_text('Test Data')
     ax1.set_xlabel('Learn Rate')
