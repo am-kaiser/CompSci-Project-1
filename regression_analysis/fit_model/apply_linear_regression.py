@@ -55,8 +55,7 @@ def apply_regression(order, num_points, noise_var, test_ratios=np.zeros(1), reg_
 
                     elif reg_type == "ols_bootstrap":
                         for boot_ind, n_boot in enumerate(n_boots):
-                            linear_reg.apply_leastsquares_bootstrap(order=ordr, test_ratio=test_ratio,
-                                                                    n_boots=n_boot, reg_method="ols")
+                            linear_reg.apply_leastsquares_bootstrap(order=ordr, test_ratio=test_ratio, n_boots=n_boot, reg_method="ols")
                             train_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0, 0, 0, 0] = linear_reg.trainMSE
                             test_MSE_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0, 0, 0, 0] = linear_reg.testMSE
                             train_R2_arr[order_ind, points_ind, noise_ind, ratio_ind, 0, 0, boot_ind, 0, 0, 0, 0] = linear_reg.trainR2
@@ -280,7 +279,7 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
 
     # Load data for statistical indicator
     data = get_data_statistic(data_path, stat, method)
-
+    
     n_ind = 0
     for i in range(len(num_points)):
         if num == num_points[i]:
@@ -333,6 +332,7 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
     # Select subset of data for given ratio, lambda, number of bootstraps and/or folds for cross-validation and plot
     # heatmap
     data_sub = data[:, n_ind, :, r_ind, rlambda_ind, llambda_ind, nb_ind, cv_ind, lr_ind, b_ind, e_ind]
+
     sns.heatmap(data_sub, annot=True, cmap="mako", vmax=np.amax(data_sub), vmin=np.amin(data_sub), xticklabels=noise_var,
                 yticklabels=order)
     plt.ylabel('Polynomial Order')
@@ -341,5 +341,5 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
 
 if __name__ == "__main__":
     # Plot one heatmap as an example
-    plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_fold=1000, ridge_lmb=122.0, lasso_lmb=112.0)
+    plot_stat(ratio=0.1, num=10, stat="test MSE", method="ridge_crossvalidation", n_boot=10, k_fold=10, ridge_lmb=1.0, lasso_lmb=0.01)
     plt.show()
