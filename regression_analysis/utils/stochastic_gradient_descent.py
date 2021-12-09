@@ -2,6 +2,10 @@
 
 import numpy as np
 
+# Note has to be disabled for jupyter notebooks:
+# import warnings
+# warnings.filterwarnings("error")
+
 
 def gradient_RR_OLS(y, X, beta, lmbda):
     """
@@ -18,7 +22,11 @@ def gradient_RR_OLS(y, X, beta, lmbda):
 
 
 def sigmoid_func(z):
-    return 1 / (1 + np.exp(-z))
+    try:
+        return 1 / (1 + np.exp(-z))
+    # If an overflow is encountered in exp the output is approximated with 0
+    except:
+        return 0
 
 
 def gradient_LR(y, X, beta, lmbda):
