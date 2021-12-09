@@ -1,9 +1,8 @@
 """Scripts to perform fitting different least square methods to resampled data."""
 import numpy as np
+from regression_analysis.utils import sampling, findStat, stochastic_gradient_descent
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
-
-from regression_analysis.utils import sampling, findStat
 
 
 def poly_powers2D(order):
@@ -59,13 +58,16 @@ def find_ridge_params(X, y_train, lmbda):
     return np.linalg.pinv(X.T @ X + lmbda * identity) @ X.T @ y_train
 
 
-def find_model_parameter(design_matrix, y_input, method, lam):
+def find_model_parameter(design_matrix, y_input, method, lam, num_epoch, learn_rate, num_min_batch):
     """
     Calculate beta for given method.
     :param design_matrix: design matrix
     :param y_input: y from training data
     :param method: fitting method to be used
     :param lam: lambda for ridge or lasso regression
+    :params num_epoch: number of epochs for stochastic gradient descent
+    :params learn_rate: learn rate for stochastic gradient descent
+    :params num_min_batch. number of mini batches for stochastic gradient descent
     :return: beta/ parameters
     """
     if method == "ols":
@@ -78,6 +80,18 @@ def find_model_parameter(design_matrix, y_input, method, lam):
         parameter = linear_model.Ridge(alpha=lam, fit_intercept=False).fit(design_matrix, y_input).coef_.T
     elif method == "scikit_lasso":
         parameter = linear_model.Lasso(alpha=lam, fit_intercept=False).fit(design_matrix, y_input).coef_.T
+    elif method == "ols_sgd":
+        start_vec = np.repeat(0.0, design_matrix.shape[1])
+        gradient = stochastic_gradient_descent.gradient_RR_OLS
+        parameter = stochastic_gradient_descent.stochastic_gradient_descent_method(gradient, y=y_input, X=design_matrix, start=start_vec,
+                                                                                   num_epoch=num_epoch, learn_rate=learn_rate,
+                                                                                   num_min_batch=num_min_batch, lmbda=0)
+    elif method == "ridge_sgd":
+        start_vec = np.repeat(0.0, design_matrix.shape[1])
+        gradient = stochastic_gradient_descent.gradient_RR_OLS
+        parameter = stochastic_gradient_descent.stochastic_gradient_descent_method(gradient, y=y_input, X=design_matrix, start=start_vec,
+                                                                                   num_epoch=num_epoch, learn_rate=learn_rate,
+                                                                                   num_min_batch=num_min_batch, lmbda=lam)
     return parameter
 
 
@@ -107,17 +121,20 @@ class linear_regression2D():
         # scaling data using mix max scaling
         self.y = (self.y - np.min(self.y)) / (np.max(self.y) - np.min(self.y))
 
-    def apply_leastsquares(self, order=3, test_ratio=0.1, reg_method="ols", lmbda=0.1):
+    def apply_leastsquares(self, order=3, test_ratio=0.1, reg_method="ols", lmbda=0.1, num_epoch=50, learn_rate=0.1, num_min_batch=5):
         """
         Performs least squares on training and testing data.
         :param order: order of polynomial which will be fitted
         :param test_ratio: size of testing data set
         :param reg_method: fitting method to be used
         :param lmbda: lambda for ridge or lasso regression
+        :params num_epoch: number of epochs for stochastic gradient descent
+        :params learn_rate: learn rate for stochastic gradient descent
+        :params num_min_batch. number of mini batches for stochastic gradient descent
         :return: MSE, R2, bias, variance for training and testing datasets
         """
         if test_ratio != 0.0:
-            # Split data ind training and testing datasets
+            # Split data in training and testing datasets
             x_train, x_test, y_train, y_test = train_test_split(np.hstack([self.x1, self.x2]), self.y,
                                                                 test_size=test_ratio)
 
@@ -138,8 +155,7 @@ class linear_regression2D():
         # Find train design matrix
         X = design_mat2D(x1_train, x2_train, order)
         # Find model parameters
-
-        beta = find_model_parameter(X, y_train, reg_method, lmbda)
+        beta = find_model_parameter(X, y_train, reg_method, lmbda, num_epoch, learn_rate, num_min_batch)
         # Fit training data
         y_model_train = np.array(X @ beta)
 
@@ -157,9 +173,9 @@ class linear_regression2D():
             self.testR2 = findStat.findR2(y_test, y_model_test)
             self.testbias = findStat.findBias4(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
-            #self.testbias = findStat.findBias3(y_train, y_test, y_model_train, y_model_test)
 
-    def apply_leastsquares_bootstrap(self, order=3, test_ratio=0.1, n_boots=10, reg_method="ols", lmbda=0.1):
+    def apply_leastsquares_bootstrap(self, order=3, test_ratio=0.1, n_boots=10, reg_method="ols", lmbda=0.1, num_epoch=50, learn_rate=0.1,
+                                     num_min_batch=5):
         """
         Performs least squares with bootstrap resampling.
         :param order: order of polynomial which will be fitted
@@ -167,6 +183,9 @@ class linear_regression2D():
         :param n_boots: number of bootstraps to be performed
         :param reg_method: fitting method to be used
         :param lmbda: lambda for ridge or lasso regression
+        :params num_epoch: number of epochs for stochastic gradient descent
+        :params learn_rate: learn rate for stochastic gradient descent
+        :params num_min_batch. number of mini batches for stochastic gradient descent
         :return: MSE, R2, bias, variance for training and testing datasets
         """
         [self.trainMSE, self.trainR2, self.testMSE, self.testR2] = [0.0, 0.0, 0.0, 0.0]
@@ -182,7 +201,7 @@ class linear_regression2D():
             # Find train design matrix
             X = design_mat2D(x1_train, x2_train, order)
             # Find model parameters
-            beta = find_model_parameter(X, y_train, reg_method, lmbda)
+            beta = find_model_parameter(X, y_train, reg_method, lmbda, num_epoch, learn_rate, num_min_batch)
             # Fit model for test and train data
             y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)
             y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta)
@@ -191,10 +210,10 @@ class linear_regression2D():
             self.trainR2 += findStat.findR2(y_train, y_model_train)
             self.testMSE += findStat.findMSE(y_test, y_model_test)
             self.testR2 += findStat.findR2(y_test, y_model_test)
-            self.trainbias = findStat.findBias(y_train, y_model_train)
-            self.trainvar = findStat.findModelVar(y_model_train)
-            self.testbias = findStat.findBias(y_test, y_model_test)
-            self.testvar = findStat.findModelVar(y_model_test)
+            self.trainbias += findStat.findBias4(y_train, y_model_train)
+            self.trainvar += findStat.findModelVar(y_model_train)
+            self.testbias += findStat.findBias4(y_test, y_model_test)
+            self.testvar += findStat.findModelVar(y_model_test)
         # Calculate mean of each error statistic
         self.trainMSE /= n_boots
         self.testMSE /= n_boots
@@ -205,11 +224,11 @@ class linear_regression2D():
         self.trainvar /= n_boots
         self.testvar /= n_boots
 
-    def apply_leastsquares_crossvalidation(self, order=3, kfolds=10, reg_method="ols", lmbda=0.1):
+    def apply_leastsquares_crossvalidation(self, order=3, kfolds=10, reg_method="ols", lmbda=0.1, num_epoch=50, learn_rate=0.1,
+                                           num_min_batch=5):
         """
         Perform least squares with k fold cross validation resampling.
         :param order: order of polynomial which will be fitted
-        :param test_ratio: size of testing data set
         :param kfolds: number of folds to be used with cross-validation
         :param reg_method: fitting method to be used
         :param lmbda: lambda for ridge or lasso regression
@@ -233,7 +252,7 @@ class linear_regression2D():
             # find train design matrix
             X = design_mat2D(x1_train, x2_train, order)
             # finding model parameters
-            beta = find_model_parameter(X, y_train, reg_method, lmbda)
+            beta = find_model_parameter(X, y_train, reg_method, lmbda, num_epoch, learn_rate, num_min_batch)
             # Fit model for test and train data
             y_model_test = np.array(design_mat2D(x1_test, x2_test, order) @ beta)
             y_model_train = np.array(design_mat2D(x1_train, x2_train, order) @ beta)
@@ -242,9 +261,9 @@ class linear_regression2D():
             self.trainR2 += findStat.findR2(y_train, y_model_train)
             self.testMSE += findStat.findMSE(y_test, y_model_test)
             self.testR2 += findStat.findR2(y_test, y_model_test)
-            self.trainbias = findStat.findBias(y_train, y_model_train)
+            self.trainbias = findStat.findBias4(y_train, y_model_train)
             self.trainvar = findStat.findModelVar(y_model_train)
-            self.testbias = findStat.findBias(y_test, y_model_test)
+            self.testbias = findStat.findBias4(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
         # Calculate mean of each error statistic
         self.trainMSE /= kfolds
@@ -257,11 +276,10 @@ class linear_regression2D():
         self.testvar /= kfolds
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     from regression_analysis.utils import franke
 
     x1, x2, y = franke.create_data(num_points=100, noise_variance=0)
 
     model = linear_regression2D(x1, x2, y)
     model.apply_leastsquares(order=5, test_ratio=0.1, reg_method="ols")
-
