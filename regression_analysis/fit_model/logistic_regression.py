@@ -95,7 +95,7 @@ class LogisticRegression:
         self.train_confusion_matrix = pd.DataFrame()
         self.test_confusion_matrix = pd.DataFrame()
 
-    def apply_logistic_regression(self, test_ratio=0.1, reg_method="logistic_sgd", lmbda=0, num_epoch=50, learn_rate=0.1, num_min_batch=5):
+    def apply_logistic_regression(self, test_ratio=None, reg_method=None, lmbda=None, num_epoch=None, learn_rate=None, num_min_batch=None):
         if test_ratio != 0.0:
             # Split data in training and testing datasets
             x_train, x_test, y_train, y_test = train_test_split(self.X, self.y, test_size=test_ratio)
@@ -126,8 +126,8 @@ class LogisticRegression:
             # Calculate confusion matrix
             self.test_confusion_matrix = make_confusion_matrix(y_test, y_model_test)
 
-    def apply_logistic_regression_crossvalidation(self, kfolds=10, reg_method="logistic_sgd", lmbda=0, num_epoch=50, learn_rate=0.1,
-                                                  num_min_batch=5):
+    def apply_logistic_regression_crossvalidation(self, kfolds=None, reg_method=None, lmbda=None, num_epoch=None, learn_rate=None,
+                                                  num_min_batch=None):
         """
         Perform logistic regression with k fold cross validation resampling.
         :param kfolds: number of folds to be used with cross-validation
