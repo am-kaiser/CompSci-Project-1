@@ -28,6 +28,7 @@ def crossvalidation(x, y, kfolds):
     """
     n = np.size(y)
     nk = int(np.floor(n / kfolds))  # number of points per fold
+    num_col = x.shape[1]
 
     # shuffling
     ind = np.arange(n)
@@ -35,10 +36,10 @@ def crossvalidation(x, y, kfolds):
     x = x[ind]
     y = y[ind]
 
-    x_test_arr = np.zeros([kfolds, nk, 2])
+    x_test_arr = np.zeros([kfolds, nk, num_col])
     y_test_arr = np.zeros([kfolds, nk])
 
-    x_train_arr = np.zeros([kfolds, n - nk, 2])
+    x_train_arr = np.zeros([kfolds, n - nk, num_col])
     y_train_arr = np.zeros([kfolds, n - nk])
 
     for k in np.arange(kfolds):
