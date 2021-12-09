@@ -1,4 +1,4 @@
-"""Script to apply different logistic regression methods with resampling to data."""
+"""Script to apply different logistic regression methods with resampling and support vector machine algorithms to data."""
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
@@ -7,19 +7,31 @@ from regression_analysis.fit_model import logistic_regression
 
 
 def plot_heatmap_conf_matrix(reg_type, l2_lambda, learn_rate, num_min_batch, epoch, test_ratio, k_fold):
-    # Calculate statistical indicators for given regression type and different resampling methods
+    """
+    Plot confusion matrices
+    :param reg_type: logistic regression or support vector machine
+    :param l2_lambda: L2 regularization parameter
+    :param learn_rate: learn rate for stochastic gradient descent
+    :param num_min_batch: number of mini batches for stochastic gradient descent
+    :param epoch: number of epochs for stochastic gradient descent
+    :param test_ratio: ratio of data used as a test dataset
+    :param k_fold: number of folds to be used with cross-validation
+    """
     # Load data
     input_data = logistic_regression.load_data()
     X_obs = logistic_regression.normalise_data(logistic_regression.design_matrix(input_data))
     y_in = input_data.diagnosis.values
+
     # Create regression object
     logistic_reg = logistic_regression.LogisticRegression(X_obs, y_in)
 
+    # Create empty plot
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
     fig.tight_layout()
     ax1.title.set_text('Train Data')
     ax2.title.set_text('Test Data')
 
+    # Plot confusion matrix for given input
     if reg_type == "logistic_sgd":
         logistic_reg.apply_logistic_regression(test_ratio=test_ratio, reg_method="logistic_sgd", lmbda=l2_lambda, num_epoch=epoch,
                                                learn_rate=learn_rate, num_min_batch=num_min_batch)
@@ -77,17 +89,28 @@ def plot_heatmap_conf_matrix(reg_type, l2_lambda, learn_rate, num_min_batch, epo
 
 
 def plot_accuracy(reg_type, l2_lambda, learn_rate, num_min_batch, epoch, test_ratio, k_fold):
-    # Calculate statistical indicators for given regression type and different resampling methods
+    """
+    Plot accuracy for test and train data given Logistic Regression with stochastic gradient descent
+    :param reg_type: logistic regression with or without cross-validation
+    :param l2_lambda: L2 regularization parameter
+    :param learn_rate: learn rate for stochastic gradient descent
+    :param num_min_batch: number of mini batches for stochastic gradient descent
+    :param epoch: number of epochs for stochastic gradient descent
+    :param test_ratio: ratio of data used as a test dataset
+    :param k_fold: number of folds to be used with cross-validation
+    """
     # Load data
     input_data = logistic_regression.load_data()
     X_obs = logistic_regression.normalise_data(logistic_regression.design_matrix(input_data))
     y_in = input_data.diagnosis.values
+
     # Create regression object
     logistic_reg = logistic_regression.LogisticRegression(X_obs, y_in)
 
+    # Create empty arrays to store test and train accuracy
     test_accr = np.empty(len(learn_rate))
     train_accr = np.empty(len(learn_rate))
-
+    # Calculate test and train accuracy for different learning rates
     for rate_ind, rate in enumerate(learn_rate):
         if reg_type == "logistic_sgd":
             logistic_reg.apply_logistic_regression(test_ratio=test_ratio, reg_method="logistic_sgd", lmbda=l2_lambda, num_epoch=epoch,
@@ -119,11 +142,6 @@ def plot_accuracy(reg_type, l2_lambda, learn_rate, num_min_batch, epoch, test_ra
     ax1.set_ylabel('Accuracy')
     ax2.set_xlabel('Learn Rate')
     ax2.set_ylabel('Accuracy')
-    ax1.set_ylim([0.8, 1])
-    ax2.set_ylim([0.8, 1])
+    ax1.set_ylim([0.85, 1.05])
+    ax2.set_ylim([0.85, 1.05])
     fig.tight_layout()
-
-
-if __name__ == "__main__":
-    plot_accuracy(reg_type="logistic_sgd", l2_lambda=0, learn_rate=[0, 1, 2, 3], num_min_batch=4, epoch=5, test_ratio=0.1, k_fold=None)
-    plt.show()

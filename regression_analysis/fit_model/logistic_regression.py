@@ -1,4 +1,4 @@
-"""Script to perform logistic regression."""
+"""Script to perform logistic regression or support vector machine algorithms."""
 
 import numpy as np
 import pandas as pd
@@ -36,6 +36,7 @@ def normalise_data(matrix):
     norm_matrix[:, 0] = matrix[:, 0]
     for col in np.arange(1, matrix.shape[1]):
         norm_matrix[:, col] = (matrix[:, col] - np.min(matrix[:, col])) / (np.max(matrix[:, col]) - np.min(matrix[:, col]))
+
     return norm_matrix
 
 
@@ -48,7 +49,7 @@ def find_logistic_model_parameter(design_matrix, y_input, method, lam, num_epoch
     :param lam: L2 regularization parameter
     :param num_epoch: number of epochs for stochastic gradient descent
     :param learn_rate: learn rate for stochastic gradient descent
-    :param num_min_batch. number of mini batches for stochastic gradient descent
+    :param num_min_batch: number of mini batches for stochastic gradient descent
     :return: beta/ parameters
     """
     if method == "logistic_sgd":
@@ -61,14 +62,16 @@ def find_logistic_model_parameter(design_matrix, y_input, method, lam, num_epoch
         parameter = linear_model.LogisticRegression(fit_intercept=False).fit(design_matrix, np.ravel(y_input)).coef_.T  # penalty???
     elif method == "svm":
         parameter = svm.SVC(kernel='linear').fit(design_matrix, np.ravel(y_input)).coef_.T
+
     return parameter
 
 
-def make_confusion_matrix(y_test, y_predict):
-    true_pos = np.count_nonzero((y_test == y_predict) & (y_test == 1))
-    true_neg = np.count_nonzero((y_test == y_predict) & (y_test == 0))
-    false_pos = np.count_nonzero((y_test != y_predict) & (y_test == 0))
-    false_neg = np.count_nonzero((y_test != y_predict) & (y_test == 1))
+def make_confusion_matrix(y, y_predict):
+    """Create confusion matrix for y and prediction of y."""
+    true_pos = np.count_nonzero((y == y_predict) & (y == 1))
+    true_neg = np.count_nonzero((y == y_predict) & (y == 0))
+    false_pos = np.count_nonzero((y != y_predict) & (y == 0))
+    false_neg = np.count_nonzero((y != y_predict) & (y == 1))
 
     confusion_matrix = np.array([[true_pos, false_neg], [false_pos, true_neg]])
 
@@ -96,6 +99,16 @@ class LogisticRegression:
         self.test_confusion_matrix = pd.DataFrame()
 
     def apply_logistic_regression(self, test_ratio=None, reg_method=None, lmbda=None, num_epoch=None, learn_rate=None, num_min_batch=None):
+        """
+        Perform logistic regression
+        :param test_ratio: ratio of data used as a test dataset
+        :param reg_method: fitting method to be used
+        :param lmbda: L2 regularization parameter
+        :param num_epoch: number of epochs for stochastic gradient descent
+        :param learn_rate: learn rate for stochastic gradient descent
+        :param num_min_batch: number of mini batches for stochastic gradient descent
+        :return: accuracy and confusion matrix for training and testing datasets
+        """
         if test_ratio != 0.0:
             # Split data in training and testing datasets
             x_train, x_test, y_train, y_test = train_test_split(self.X, self.y, test_size=test_ratio)
@@ -112,6 +125,7 @@ class LogisticRegression:
         # transform y_model_train to be either 0 or 1
         y_model_train = transform_0_1(y_model_train)
         # Calculate accuracy for training data
+        print(y_model_train.shape, y_train.shape)
         self.train_accuracy = np.mean(y_train == y_model_train)
         # Calculate confusion matrix
         self.train_confusion_matrix = make_confusion_matrix(y_train, y_model_train)
@@ -129,10 +143,13 @@ class LogisticRegression:
     def apply_logistic_regression_crossvalidation(self, kfolds=None, reg_method=None, lmbda=None, num_epoch=None, learn_rate=None,
                                                   num_min_batch=None):
         """
-        Perform logistic regression with k fold cross validation resampling.
+        Perform logistic regression with k fold cross validation resampling
         :param kfolds: number of folds to be used with cross-validation
         :param reg_method: fitting method to be used
         :param lmbda: L2 regularization parameter
+        :param num_epoch: number of epochs for stochastic gradient descent
+        :param learn_rate: learn rate for stochastic gradient descent
+        :param num_min_batch: number of mini batches for stochastic gradient descent
         :return: accuracy and confusion matrix for training and testing datasets
         """
         [self.train_accuracy, self.test_accuracy] = [0.0, 0.0]
@@ -167,43 +184,3 @@ class LogisticRegression:
 
         self.train_confusion_matrix = (self.train_confusion_matrix / kfolds).round(0).astype('int')
         self.test_confusion_matrix = (self.test_confusion_matrix / kfolds).round(0).astype('int')
-
-
-if __name__ == "__main__":
-    input_data = load_data()
-    X_obs = normalise_data(design_matrix(input_data))
-    y_in = input_data.diagnosis.values
-
-    logistic_regression_object = LogisticRegression(X_obs, y_in)
-    logistic_regression_object.apply_logistic_regression(test_ratio=0.1, reg_method="logistic_sgd", lmbda=0, num_epoch=50,
-                                                         learn_rate=0.1, num_min_batch=5)
-    print(logistic_regression_object.train_confusion_matrix)
-    print(logistic_regression_object.test_confusion_matrix)
-    print(logistic_regression_object.test_accuracy)
-    print('---')
-    logistic_regression_object.apply_logistic_regression(test_ratio=0.1, reg_method="logistic_scikit")
-    print(logistic_regression_object.train_confusion_matrix)
-    print(logistic_regression_object.test_confusion_matrix)
-    print(logistic_regression_object.test_accuracy)
-    print('---')
-    logistic_regression_object.apply_logistic_regression_crossvalidation(kfolds=10, reg_method="logistic_sgd", lmbda=0, num_epoch=50,
-                                                                         learn_rate=0.1, num_min_batch=5)
-    print(logistic_regression_object.train_confusion_matrix)
-    print(logistic_regression_object.test_confusion_matrix)
-    print(logistic_regression_object.test_accuracy)
-    print('---')
-    logistic_regression_object.apply_logistic_regression_crossvalidation(kfolds=10, reg_method="logistic_scikit")
-    print(logistic_regression_object.train_confusion_matrix)
-    print(logistic_regression_object.test_confusion_matrix)
-    print(logistic_regression_object.test_accuracy)
-    print('---')
-    logistic_regression_object.apply_logistic_regression(test_ratio=0.1, reg_method="svm")
-    print(logistic_regression_object.train_confusion_matrix)
-    print(logistic_regression_object.test_confusion_matrix)
-    print(logistic_regression_object.test_accuracy)
-    print('---')
-    logistic_regression_object.apply_logistic_regression_crossvalidation(kfolds=10, reg_method="svm")
-    print(logistic_regression_object.train_confusion_matrix)
-    print(logistic_regression_object.test_confusion_matrix)
-    print(logistic_regression_object.test_accuracy)
-    print('---')
