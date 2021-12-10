@@ -34,9 +34,12 @@ def normalise_data(matrix):
     """Normalise given matrix column-wise"""
     norm_matrix = np.empty([matrix.shape[0], matrix.shape[1]])
     norm_matrix[:, 0] = matrix[:, 0]
-    for col in np.arange(1, matrix.shape[1]):
-        norm_matrix[:, col] = (matrix[:, col] - np.min(matrix[:, col])) / (np.max(matrix[:, col]) - np.min(matrix[:, col]))
+    #for col in np.arange(1, matrix.shape[1]):
+    #    norm_matrix[:, col] = (matrix[:, col] - np.min(matrix[:, col])) / (np.max(matrix[:, col]) - np.min(matrix[:, col]))
 
+    #vectorised form, needs testing, below line should work similar but faster compared to the above for loop.
+    norm_matrix[:, 1:] = (matrix[:, 1:] - np.min(matrix[:, 1:], axis=0))/(np.max(matrix[:, 1:], axis=0)-np.min(matrix[:, 1:], axis=0))
+    
     return norm_matrix
 
 
@@ -80,11 +83,16 @@ def make_confusion_matrix(y, y_predict):
 
 def transform_0_1(values):
     """Transform content of numpy array to either 0 or 1."""
+    """
     for elem in range(values.shape[0]):
         if values[elem, 0] < 0:
             values[elem, 0] = 0
         else:
             values[elem, 0] = 1
+    """
+    #vectorised version below
+    values = np.where(values<0, 0, 1)
+    
     return values
 
 
