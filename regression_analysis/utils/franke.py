@@ -1,8 +1,11 @@
+"""Scripts to create data from Franke funtion to be used in linear regression."""
+
 import numpy as np
 from numpy import random as npr
 
 
 def Franke(x1, x2, noise_var=0.0):
+    """Calculate data from Franke function with truncated noise."""
     a = 0.75 * np.exp(-((9 * x1 - 2) ** 2) / 4 - ((9 * x2 - 2) ** 2) / 4)
     b = 0.75 * np.exp(-((9 * x1 + 1) ** 2) / 49 - (9 * x2 + 1) / 10)
     c = 0.5 * np.exp(-((9 * x1 - 7) ** 2) / 4 - ((9 * x2 - 3) ** 2) / 4)
@@ -16,6 +19,7 @@ def Franke(x1, x2, noise_var=0.0):
 
 
 def create_data(num_points, noise_variance):
+    """Create data from Franke function and als return x values."""
     x1 = np.linspace(0, 1, num_points)
     x2 = np.linspace(0, 1, num_points)
     xx1, xx2 = np.meshgrid(x1, x2)
@@ -38,7 +42,3 @@ def Franke_and_biascorrection(x1, x2, noise_var=0.0):
     e[np.where(e > 1.0)] = 1.0
     e[np.where(e < -1.0)] = -1.0
     return a + b + c - d + e, np.var(e)
-
-
-if __name__ == '__main__':
-    print(create_data(100, 0.1))

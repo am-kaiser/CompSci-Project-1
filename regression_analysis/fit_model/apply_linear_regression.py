@@ -1,4 +1,4 @@
-"""Script to apply different regression methods with resampling to data."""
+"""Script to apply different linear regression methods with resampling to data."""
 import os
 
 import matplotlib.pyplot as plt
@@ -18,6 +18,21 @@ def create_0(order, num_points, noise_var, test_ratios, ridge_lambda, lasso_lamb
 def apply_regression(order, num_points, noise_var, test_ratios=np.zeros(1), reg_type="ols", ridge_lambda=np.ones(1),
                      lasso_lambda=np.ones(1), n_boots=np.ones(1, dtype=int), k_folds=np.ones(1, dtype=int), learn_rate=np.ones(1),
                      num_min_batch=np.ones(1), epochs=np.ones(1)):
+    """
+    Apply specified linear regression method to data with given parameters
+    :param order: order of polynomial which will be fitted
+    :param num_points: number of points to be used for the simulation
+    :param noise_var: noise variance to be used in Franke function
+    :param test_ratios: size of testing data set
+    :param reg_type: fitting method to be used
+    :param ridge_lambda: lambda for ridge regression
+    :param lasso_lambda: lambda for lasso regression
+    :param n_boots: number of bootstraps
+    :param k_folds: number of folds to be used in cross-validation
+    :param learn_rate: learn rate for stochastic gradient descent
+    :param num_min_batch: number of mini batches for stochastic gradient descent
+    :param epochs: number of epochs for stochastic gradient descent
+    """
     # applies regression for multiple parameter combos
     train_MSE_arr = create_0(order, num_points, noise_var, test_ratios, ridge_lambda, lasso_lambda, n_boots, k_folds, learn_rate,
                              num_min_batch, epochs)
@@ -224,7 +239,7 @@ def apply_regression(order, num_points, noise_var, test_ratios=np.zeros(1), reg_
 
 def get_data_path():
     """
-    Get the directory from which the scripts is executed to load the data correctly. This is especially important for
+    Get the directory from which the script is executed to load the data correctly. This is especially important for
     the execution in a jupyter notebook.
     """
     current_path = os.getcwd()
@@ -338,8 +353,3 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
     plt.ylabel('Polynomial Order')
     plt.xlabel('Noise Variance')
 
-
-if __name__ == "__main__":
-    # Plot one heatmap as an example
-    plot_stat(ratio=0.1, num=10, stat="test MSE", method="ridge_crossvalidation", n_boot=10, k_fold=10, ridge_lmb=1.0, lasso_lmb=0.01)
-    plt.show()
