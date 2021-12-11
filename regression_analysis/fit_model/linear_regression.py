@@ -277,4 +277,3 @@ class linear_regression2D():
         self.testbias /= kfolds
         self.trainvar /= kfolds
         self.testvar /= kfolds
-

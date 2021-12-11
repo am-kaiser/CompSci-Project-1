@@ -6,7 +6,7 @@ from sklearn import linear_model, svm
 from sklearn.model_selection import train_test_split
 import os
 
-from regression_analysis.utils import stochastic_gradient_descent, findStat, sampling
+from regression_analysis.utils import stochastic_gradient_descent, sampling
 
 
 def load_data(file_name='regression_analysis/examples/data_logistic_regression/data.csv'):

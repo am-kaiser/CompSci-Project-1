@@ -27,7 +27,7 @@ def sigmoid_func(z):
         elif elem > 745:
             exponential[elem_in, 0] = 0
         else:
-            print(z[elem_in,0])
+            print(z[elem_in, 0])
             exit()
 
     return 1 / (1 + exponential)

@@ -352,4 +352,3 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
                 yticklabels=order)
     plt.ylabel('Polynomial Order')
     plt.xlabel('Noise Variance')
-
