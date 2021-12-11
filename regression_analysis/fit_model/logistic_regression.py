@@ -32,14 +32,15 @@ def design_matrix(data):
 
 def normalise_data(matrix):
     """Normalise given matrix column-wise"""
-    norm_matrix = np.empty([matrix.shape[0], matrix.shape[1]])
+    norm_matrix = np.zeros([matrix.shape[0], matrix.shape[1]])
     norm_matrix[:, 0] = matrix[:, 0]
-    #for col in np.arange(1, matrix.shape[1]):
-    #    norm_matrix[:, col] = (matrix[:, col] - np.min(matrix[:, col])) / (np.max(matrix[:, col]) - np.min(matrix[:, col]))
+    for col in np.arange(1, matrix.shape[1]):
+        denominator = np.max(matrix[:, col]) - np.min(matrix[:, col])
+        if denominator != 0:
+            norm_matrix[:, col] = (matrix[:, col] - np.min(matrix[:, col])) / denominator
+        else:
+            norm_matrix[:, col] = matrix[:, col]
 
-    #vectorised form, needs testing, below line should work similar but faster compared to the above for loop.
-    norm_matrix[:, 1:] = (matrix[:, 1:] - np.min(matrix[:, 1:], axis=0))/(np.max(matrix[:, 1:], axis=0)-np.min(matrix[:, 1:], axis=0))
-    
     return norm_matrix
 
 
@@ -83,17 +84,7 @@ def make_confusion_matrix(y, y_predict):
 
 def transform_0_1(values):
     """Transform content of numpy array to either 0 or 1."""
-    """
-    for elem in range(values.shape[0]):
-        if values[elem, 0] < 0:
-            values[elem, 0] = 0
-        else:
-            values[elem, 0] = 1
-    """
-    #vectorised version below
-    values = np.where(values<0, 0, 1)
-    
-    return values
+    return np.where(values < 0, 0, 1)
 
 
 class LogisticRegression:
@@ -133,7 +124,6 @@ class LogisticRegression:
         # transform y_model_train to be either 0 or 1
         y_model_train = transform_0_1(y_model_train)
         # Calculate accuracy for training data
-        print(y_model_train.shape, y_train.shape)
         self.train_accuracy = np.mean(y_train == y_model_train)
         # Calculate confusion matrix
         self.train_confusion_matrix = make_confusion_matrix(y_train, y_model_train)
