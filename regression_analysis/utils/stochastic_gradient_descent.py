@@ -2,10 +2,6 @@
 
 import numpy as np
 
-# Note has to be disabled for jupyter notebooks:
-# import warnings
-# warnings.filterwarnings("error")
-
 
 def gradient_RR_OLS(y, X, beta, lmbda):
     """
@@ -22,11 +18,19 @@ def gradient_RR_OLS(y, X, beta, lmbda):
 
 
 def sigmoid_func(z):
-    try:
-        return 1 / (1 + np.exp(-z))
-    # If an overflow is encountered in exp the output is approximated with 0
-    except:
-        return 0
+    """Calculate sigmoid function."""
+    # If z is bigger than 700 exp(-z) is approximated with 0 to prevent an overflow error.
+    exponential = np.zeros((z.shape[0], 1))
+    for elem_in, elem in enumerate(z):
+        if -745 <= elem <= 745:
+            exponential[elem_in, 0] = np.exp(-z[elem_in, 0])
+        elif elem > 745:
+            exponential[elem_in, 0] = 0
+        else:
+            print(z[elem_in,0])
+            exit()
+
+    return 1 / (1 + exponential)
 
 
 def gradient_LR(y, X, beta, lmbda):
