@@ -19,18 +19,16 @@ def gradient_RR_OLS(y, X, beta, lmbda):
 
 def sigmoid_func(z):
     """Calculate sigmoid function."""
-    # If z is bigger than 700 exp(-z) is approximated with 0 to prevent an overflow error.
-    exponential = np.zeros((z.shape[0], 1))
+    sigmoid = np.zeros((z.shape[0], 1))
     for elem_in, elem in enumerate(z):
-        if -745 <= elem <= 745:
-            exponential[elem_in, 0] = np.exp(-z[elem_in, 0])
-        elif elem > 745:
-            exponential[elem_in, 0] = 0
+        if -700 <= elem <= 700:
+            sigmoid[elem_in, 0] = 1 / (1 + np.exp(-z[elem_in, 0]))
+        elif elem > 700:
+            sigmoid[elem_in, 0] = 1  # exp(-z) -> 0 if z -> inf
         else:
-            print(z[elem_in, 0])
-            exit()
+            sigmoid[elem_in, 0] = 0  # exp(-z) -> inf if z -> -inf and 1/inf = 0
 
-    return 1 / (1 + exponential)
+    return sigmoid
 
 
 def gradient_LR(y, X, beta, lmbda):
@@ -68,7 +66,7 @@ def stochastic_gradient_descent_method(gradient, y, X, start, num_epoch, learn_r
             y_batch = y[batch_index]
             descend = learn_rate * gradient(y=y_batch, X=X_batch, beta=vector, lmbda=lmbda)
             # Stop if all values are smaller or equal than machine precision
-            if np.all(descend) <= np.finfo(float).eps:
+            if np.any(descend) <= np.finfo(float).eps:
                 break
             vector -= descend
     return vector
