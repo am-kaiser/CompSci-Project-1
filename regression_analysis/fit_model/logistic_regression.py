@@ -39,7 +39,7 @@ def normalise_data(matrix):
         if denominator != 0:
             norm_matrix[:, col] = (matrix[:, col] - np.min(matrix[:, col])) / denominator
         else:
-            norm_matrix[:, col] = matrix[:, col]
+            norm_matrix[:, col] = np.repeat(1.0, matrix.shape[0])
 
     return norm_matrix
 
