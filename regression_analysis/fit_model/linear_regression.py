@@ -123,14 +123,14 @@ class linear_regression2D():
 
     def apply_leastsquares(self, order=3, test_ratio=0.1, reg_method="ols", lmbda=0.1, num_epoch=50, learn_rate=0.1, num_min_batch=5):
         """
-        Performs least squares on training and testing data.
+        Performs least squares on training and testing data
         :param order: order of polynomial which will be fitted
         :param test_ratio: size of testing data set
         :param reg_method: fitting method to be used
         :param lmbda: lambda for ridge or lasso regression
-        :params num_epoch: number of epochs for stochastic gradient descent
-        :params learn_rate: learn rate for stochastic gradient descent
-        :params num_min_batch. number of mini batches for stochastic gradient descent
+        :param num_epoch: number of epochs for stochastic gradient descent
+        :param learn_rate: learn rate for stochastic gradient descent
+        :param num_min_batch. number of mini batches for stochastic gradient descent
         :return: MSE, R2, bias, variance for training and testing datasets
         """
         if test_ratio != 0.0:
@@ -177,15 +177,15 @@ class linear_regression2D():
     def apply_leastsquares_bootstrap(self, order=3, test_ratio=0.1, n_boots=10, reg_method="ols", lmbda=0.1, num_epoch=50, learn_rate=0.1,
                                      num_min_batch=5):
         """
-        Performs least squares with bootstrap resampling.
+        Performs least squares with bootstrap resampling
         :param order: order of polynomial which will be fitted
         :param test_ratio: size of testing data set
         :param n_boots: number of bootstraps to be performed
         :param reg_method: fitting method to be used
         :param lmbda: lambda for ridge or lasso regression
-        :params num_epoch: number of epochs for stochastic gradient descent
-        :params learn_rate: learn rate for stochastic gradient descent
-        :params num_min_batch. number of mini batches for stochastic gradient descent
+        :param num_epoch: number of epochs for stochastic gradient descent
+        :param learn_rate: learn rate for stochastic gradient descent
+        :param num_min_batch. number of mini batches for stochastic gradient descent
         :return: MSE, R2, bias, variance for training and testing datasets
         """
         [self.trainMSE, self.trainR2, self.testMSE, self.testR2] = [0.0, 0.0, 0.0, 0.0]
@@ -227,11 +227,14 @@ class linear_regression2D():
     def apply_leastsquares_crossvalidation(self, order=3, kfolds=10, reg_method="ols", lmbda=0.1, num_epoch=50, learn_rate=0.1,
                                            num_min_batch=5):
         """
-        Perform least squares with k fold cross validation resampling.
+        Perform least squares with k fold cross validation resampling
         :param order: order of polynomial which will be fitted
         :param kfolds: number of folds to be used with cross-validation
         :param reg_method: fitting method to be used
         :param lmbda: lambda for ridge or lasso regression
+        :param num_epoch: number of epochs for stochastic gradient descent
+        :param learn_rate: learn rate for stochastic gradient descent
+        :param num_min_batch. number of mini batches for stochastic gradient descent
         :return: MSE, R2, bias, variance for training and testing datasets
         """
         [self.trainMSE, self.trainR2, self.testMSE, self.testR2] = [0.0, 0.0, 0.0, 0.0]
@@ -274,12 +277,3 @@ class linear_regression2D():
         self.testbias /= kfolds
         self.trainvar /= kfolds
         self.testvar /= kfolds
-
-
-if __name__ == "__main__":
-    from regression_analysis.utils import franke
-
-    x1, x2, y = franke.create_data(num_points=100, noise_variance=0)
-
-    model = linear_regression2D(x1, x2, y)
-    model.apply_leastsquares(order=5, test_ratio=0.1, reg_method="ols")

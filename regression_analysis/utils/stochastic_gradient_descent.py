@@ -2,18 +2,14 @@
 
 import numpy as np
 
-# Note has to be disabled for jupyter notebooks:
-# import warnings
-# warnings.filterwarnings("error")
-
 
 def gradient_RR_OLS(y, X, beta, lmbda):
     """
-    Define the gradient for ordinary least squares and ridge regression.
-    :params y: observed values
-    :params X: design matrix
-    :params beta: parameter vector/ regression coefficients
-    :params lmbda: When lam=0 it is OLS and otherwise ridge regression.
+    Define the gradient for ordinary least squares and ridge regression
+    :param y: observed values
+    :param X: design matrix
+    :param beta: parameter vector/ regression coefficients
+    :param lmbda: When lam=0 it is OLS and otherwise ridge regression.
     :return: gradient of cost function
     """
     n = len(y)
@@ -22,20 +18,28 @@ def gradient_RR_OLS(y, X, beta, lmbda):
 
 
 def sigmoid_func(z):
-    try:
-        return 1 / (1 + np.exp(-z))
-    # If an overflow is encountered in exp the output is approximated with 0
-    except:
-        return 0
+    """Calculate sigmoid function."""
+    # If z is bigger than 700 exp(-z) is approximated with 0 to prevent an overflow error.
+    exponential = np.zeros((z.shape[0], 1))
+    for elem_in, elem in enumerate(z):
+        if -745 <= elem <= 745:
+            exponential[elem_in, 0] = np.exp(-z[elem_in, 0])
+        elif elem > 745:
+            exponential[elem_in, 0] = 0
+        else:
+            print(z[elem_in, 0])
+            exit()
+
+    return 1 / (1 + exponential)
 
 
 def gradient_LR(y, X, beta, lmbda):
     """
-    Define the gradient for logistic regression.
-    :params y: observed values
-    :params X: design matrix
-    :params beta: parameter vector/ regression coefficients
-    :params lmbda: L2 regularization parameter
+    Define the gradient for logistic regression
+    :param y: observed values
+    :param X: design matrix
+    :param beta: parameter vector/ regression coefficients
+    :param lmbda: L2 regularization parameter
     :return: gradient of cost function
     """
     gradient = (-1) * X.T @ (y - sigmoid_func(X @ beta)) - lmbda*beta
@@ -44,15 +48,15 @@ def gradient_LR(y, X, beta, lmbda):
 
 def stochastic_gradient_descent_method(gradient, y, X, start, num_epoch, learn_rate, num_min_batch, lmbda):
     """
-    Define gradient descent method to find optimal beta for given gradient.
-    :params gradient: gradient of cost function
-    :params y: observed values
-    :params X: design matrix
-    :params start: initial values
-    :params num_epoch: number of epochs
-    :params learn_rate: learn rate
-    :params num_min_batch. number of mini batches
-    :params lmbda: When lam=0 it is OLS and otherwise ridge regression.
+    Define gradient descent method to find optimal beta for given gradient
+    :param gradient: gradient of cost function
+    :param y: observed values
+    :param X: design matrix
+    :param start: initial values
+    :param num_epoch: number of epochs
+    :param learn_rate: learn rate
+    :param num_min_batch. number of mini batches
+    :param lmbda: When lam=0 it is OLS and otherwise ridge regression.
     :return: beta
     """
     vector = start.reshape(start.shape[0], 1)
