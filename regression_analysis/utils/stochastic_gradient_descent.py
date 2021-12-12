@@ -21,9 +21,9 @@ def sigmoid_func(z):
     """Calculate sigmoid function."""
     sigmoid = np.zeros((z.shape[0], 1))
     for elem_in, elem in enumerate(z):
-        if -745 <= elem <= 745:
+        if -700 <= elem <= 700:
             sigmoid[elem_in, 0] = 1 / (1 + np.exp(-z[elem_in, 0]))
-        elif elem > 745:
+        elif elem > 700:
             sigmoid[elem_in, 0] = 1  # exp(-z) -> 0 if z -> inf
         else:
             sigmoid[elem_in, 0] = 0  # exp(-z) -> inf if z -> -inf and 1/inf = 0
