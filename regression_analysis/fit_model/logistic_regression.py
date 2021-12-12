@@ -1,10 +1,11 @@
 """Script to perform logistic regression or support vector machine algorithms."""
 
+import os
+
 import numpy as np
 import pandas as pd
 from sklearn import linear_model, svm
 from sklearn.model_selection import train_test_split
-import os
 
 from regression_analysis.utils import stochastic_gradient_descent, sampling
 
