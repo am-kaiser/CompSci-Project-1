@@ -109,14 +109,14 @@ class linear_regression2D():
         self.x2 = x2
         self.y = y
         self.n_points = y.shape[0]
-        self.trainMSE = np.nan
-        self.trainR2 = np.nan
-        self.testMSE = np.nan
-        self.testR2 = np.nan
-        self.trainbias = np.nan
-        self.testbias = np.nan
-        self.trainvar = np.nan
-        self.testvar = np.nan
+        self.trainMSE = 0.0
+        self.trainR2 = 0.0
+        self.testMSE = 0.0
+        self.testR2 = 0.0
+        self.trainbias = 0.0
+        self.testbias = 0.0
+        self.trainvar = 0.0
+        self.testvar = 0.0
 
         # scaling data using mix max scaling
         self.y = (self.y - np.amin(self.y)) / (np.amax(self.y) - np.amin(self.y))
