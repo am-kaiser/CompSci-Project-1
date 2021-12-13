@@ -15,10 +15,6 @@ def test_poly_powers2D():
     np.testing.assert_array_equal(np.sort(x1_powers), expected_pow)
 
 
-def test_design_mat2D():
-    pass
-
-
 def test_find_model_parameter():
     """Test if the betas from our code is the same as the ones from scikit-learn."""
     # Get data from Franke function

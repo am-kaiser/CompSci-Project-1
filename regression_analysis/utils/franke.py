@@ -1,4 +1,4 @@
-"""Scripts to create data from Franke funtion to be used in linear regression."""
+"""Scripts to create data from Franke fucntion to be used in linear regression."""
 
 import numpy as np
 from numpy import random as npr
