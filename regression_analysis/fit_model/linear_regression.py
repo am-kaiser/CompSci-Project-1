@@ -264,9 +264,9 @@ class linear_regression2D():
             self.trainR2 += findStat.findR2(y_train, y_model_train)
             self.testMSE += findStat.findMSE(y_test, y_model_test)
             self.testR2 += findStat.findR2(y_test, y_model_test)
-            self.trainbias = findStat.findBias4(y_train, y_model_train)
+            self.trainbias = findStat.findBias(y_train, y_model_train)
             self.trainvar = findStat.findModelVar(y_model_train)
-            self.testbias = findStat.findBias4(y_test, y_model_test)
+            self.testbias = findStat.findBias(y_test, y_model_test)
             self.testvar = findStat.findModelVar(y_model_test)
         # Calculate mean of each error statistic
         self.trainMSE /= kfolds
