@@ -391,7 +391,86 @@ def get_data_statistic(data_path, statistic, method):
     return np.load(data_path + file_name)
 
 
-def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_fold=1000, ridge_lmb=122.0, lasso_lmb=112.2, learn_rate=0.1,
+def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_fold=1000, ridge_lmb=122.0, lasso_lmb=112.2):
+    """
+    Create heatmap for given statistical indicator and sampling method
+    :param ratio: ratio of the dataset to be used for testing
+    :param num: length of dataset
+    :param stat: statistical indicator
+    :param method: resampling method
+    :param n_boot: number of times bootstrap is performed if method=*_bootstrap
+    :param k_fold: number of folds for cross-validation if method=*_crossvalidation
+    :param ridge_lmb: lambda for ridge regression
+    :param lasso_lmb: lambda for lasso regression
+    """
+    # Path to example data
+    data_path = get_data_path()
+
+
+    # Load data
+    order = np.load(data_path + "order.npy")
+    num_points = np.load(data_path + "num_points.npy")
+    noise_var = np.load(data_path + "noise_var.npy")
+    test_ratio = np.load(data_path + "test_ratio.npy")
+    ridge_lambda = np.load(data_path + "ridge_lambda.npy")
+    k_folds = np.load(data_path + "k_folds.npy")
+    n_boots = np.load(data_path + "n_boots.npy")
+    lasso_lambda = np.load(data_path + "lasso_lambda.npy")
+    learn_rates = np.load(data_path + "learn_rates.npy")
+    num_mini_batches = np.load(data_path + "num_min_batches.npy")
+    epochs = np.load(data_path + "epochs.npy")
+
+    # Load data for statistical indicator
+    data = get_data_statistic(data_path, stat, method)
+
+    n_ind = 0
+    for i in range(len(num_points)):
+        if num == num_points[i]:
+            n_ind = i
+    r_ind = 0
+    for i in range(len(test_ratio)):
+        if ratio == test_ratio[i]:
+            r_ind = i
+    rlambda_ind = 0
+    for i in range(len(ridge_lambda)):
+        if ridge_lmb == ridge_lambda[i]:
+            rlambda_ind = i
+    llambda_ind = 0
+    for i in range(len(lasso_lambda)):
+        if lasso_lmb == lasso_lambda[i]:
+            llambda_ind = i
+    nb_ind = 0
+    for i in range(len(n_boots)):
+        if n_boot == n_boots[i]:
+            nb_ind = i
+    cv_ind = 0
+    for i in range(len(k_folds)):
+        if k_fold == k_folds[i]:
+            cv_ind = i
+
+    if "crossvalidation" in method:
+        r_ind = 0
+    else:
+        cv_ind = 0
+    if "bootstrap" not in method:
+        nb_ind = 0
+    if "ridge" not in method:
+        rlambda_ind = 0
+    if "lasso" not in method:
+        llambda_ind = 0
+
+
+    # Select subset of data for given ratio, lambda, number of bootstraps and/or folds for cross-validation and plot heatmap
+    data_sub = data[:, n_ind, :, r_ind, rlambda_ind, llambda_ind, nb_ind, cv_ind]
+    
+
+    sns.heatmap(data_sub, annot=True, cmap="mako", vmax=np.amax(data_sub), vmin=np.amin(data_sub), xticklabels=noise_var,
+                yticklabels=order)
+    plt.ylabel('Polynomial Order')
+    plt.xlabel('Noise Variance')
+
+
+def plot_stat_sgd(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_fold=1000, ridge_lmb=122.0, lasso_lmb=112.2, learn_rate=0.1,
               batch=5, epoch=50):
     """
     Create heatmap for given statistical indicator and sampling method
@@ -408,10 +487,7 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
     :param batch: number of mini batches for stochastic gradient descent
     """
     # Path to example data
-    if "sgd" not in method:
-        data_path = get_data_path()
-    else:
-        data_path = get_data_path_sgd()
+    data_path = get_data_path_sgd()
 
     # Load data
     order = np.load(data_path + "order.npy")
@@ -479,10 +555,7 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
         e_ind = 0
 
     # Select subset of data for given ratio, lambda, number of bootstraps and/or folds for cross-validation and plot heatmap
-    if "sgd" not in method:
-        data_sub = data[:, n_ind, :, r_ind, rlambda_ind, llambda_ind, nb_ind, cv_ind]
-    else:
-        data_sub = data[:, n_ind, :, r_ind, rlambda_ind, llambda_ind, nb_ind, cv_ind, lr_ind, b_ind, e_ind]
+    data_sub = data[:, n_ind, :, r_ind, rlambda_ind, llambda_ind, nb_ind, cv_ind, lr_ind, b_ind, e_ind]
 
     sns.heatmap(data_sub, annot=True, cmap="mako", vmax=np.amax(data_sub), vmin=np.amin(data_sub), xticklabels=noise_var,
                 yticklabels=order)
