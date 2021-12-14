@@ -556,8 +556,9 @@ def plot_stat_sgd(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000
 
     # Select subset of data for given ratio, lambda, number of bootstraps and/or folds for cross-validation and plot heatmap
     data_sub = data[:, n_ind, :, r_ind, rlambda_ind, llambda_ind, nb_ind, cv_ind, lr_ind, b_ind, e_ind]
-
+    fig, ax = plt.subplots(figsize=(10, 5))
+    fig.tight_layout()
     sns.heatmap(data_sub, annot=True, cmap="mako", vmax=np.amax(data_sub), vmin=np.amin(data_sub), xticklabels=noise_var,
-                yticklabels=order)
+                yticklabels=order, ax=ax)
     plt.ylabel('Polynomial Order')
     plt.xlabel('Noise Variance')
