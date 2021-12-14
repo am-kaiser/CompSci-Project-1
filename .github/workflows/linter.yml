@@ -53,3 +53,11 @@ jobs:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           IGNORE_GITIGNORED_FILES: true
+          VALIDATE_PYTHON_PYLINT: false
+          VALIDATE_PYTHON_BLACK: false
+          VALIDATE_JSCPD: false
+          VALIDATE_MARKDOWN: false
+          VALIDATE_PYTHON_ISORT: false
+          VALIDATE_PYTHON_MYPY: false
+          VALIDATE_BASH_EXEC: false
+          VALIDATE_YAML: false
