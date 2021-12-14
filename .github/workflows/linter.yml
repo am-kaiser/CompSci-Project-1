@@ -1,7 +1,7 @@
 ---
 # Inspired by: https://github.com/github/super-linter
 # this action runs the super linter. It is a simple combination of
-#various linters, written in bash, to help validate the source code
+# various linters, written in bash, to help validate the source code
 # of this repository.
 name: linter
 
@@ -41,8 +41,9 @@ jobs:
       # Run Linter against code base #
       ################################
       - name: Lint Code Base
-        uses: github/super-linter@v4
+        uses: github/super-linter/slim@v4
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          IGNORE_GITIGNORED_FILES: true
