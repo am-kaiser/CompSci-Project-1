@@ -1,32 +1,63 @@
 ---
-# this action runs the super linter. It is a simple combination of
-#various linters, written in bash, to help validate the source code
-# of this repository.
-name: linter
+#################################
+#################################
+## Super Linter GitHub Actions ##
+#################################
+#################################
+name: Lint Code Base
 
-# this linter will run on pushes to the master branch and
-# pull requests for the master branch
+#
+# Documentation:
+# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
+#
+
+#############################
+# Start the job on all push #
+#############################
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 
+
+###############
+# Set the Job #
+###############
 jobs:
   build:
+    # Name the Job
+    name: Lint Code Base
+    # Set the agent to run on
     runs-on: ubuntu-latest
 
+    ##################
+    # Load all steps #
+    ##################
     steps:
-      - uses: actions/checkout@v2
-      - name: Super-Linter
+      ##########################
+      # Checkout the code base #
+      ##########################
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      ################################
+      # Run Linter against code base #
+      ################################
+      - name: Lint Code Base
         uses: github/super-linter/slim@v4
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          IGNORE_GITIGNORED_FILES: true
           VALIDATE_PYTHON_PYLINT: false
           VALIDATE_PYTHON_BLACK: false
-          VALIDATE_ALL_CODEBASE: false
           VALIDATE_JSCPD: false
           VALIDATE_MARKDOWN: false
           VALIDATE_PYTHON_ISORT: false
           VALIDATE_PYTHON_MYPY: false
           VALIDATE_BASH_EXEC: false
+          VALIDATE_YAML: false
