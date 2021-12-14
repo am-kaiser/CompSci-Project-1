@@ -1,12 +1,19 @@
 ---
-# Inspired by: https://github.com/github/super-linter
-# this action runs the super linter. It is a simple combination of
-# various linters, written in bash, to help validate the source code
-# of this repository.
-name: linter
+#################################
+#################################
+## Super Linter GitHub Actions ##
+#################################
+#################################
+name: Lint Code Base
 
-# this linter will run on pushes to the main branch and
-# pull requests for the main branch
+#
+# Documentation:
+# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
+#
+
+#############################
+# Start the job on all push #
+#############################
 on:
   push:
     branches: [main]
@@ -34,7 +41,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
-          # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
       ################################
