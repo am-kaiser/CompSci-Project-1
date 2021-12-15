@@ -1,0 +1,41 @@
+\subsection{Method} \label{subsec:method_logistic_regression}
+Linear regression can be extended to classification by two changes \cite{murphy_machine_2012}. First is the change of the Gaussian distribution for $y$ with a Bernoulli distribution, a more appropriate for the case of binary response, $y \in \{0,1\}$. 
+
+$$
+p(y \mid \mathbf{x}, \theta)=Ber(y|\mu(x))) = p^k(1-p)^k$$ 
+
+Second is to pass the linear combination of the inputs to a function that ensures $0 \leq \mu(x)\leq 1$. This is achieved by using a logit function also known as sigmoid function, $\mu(x) = sigm(\mathbf{w^T x})$. 
+
+We define,
+$$
+sigm(z ) = \frac{1}{1 + e^{-z}}
+$$
+
+Putting these two steps together we get,
+$$
+p(y \mid \mathbf{x}, \theta)=Ber(y|sigm(\mathbf{w^T x})))
+$$
+The negative log-likelihood for logistic regression is given by, 
+$$
+\begin{aligned}\mathrm{NLL}(\mathbf{w}) &=-\sum_{i=1}^{N} \log \left[\mu_{i}^{\mathrm{I}\left(y_{i}=1\right)} \times\left(1-\mu_{i}\right)^{\mathrm{I}\left(y_{i}=0\right)}\right] \\&=-\sum_{i=1}^{N}\left[y_{i} \log \mu_{i}+\left(1-y_{i}\right) \log \left(1-\mu_{i}\right)\right]\end{aligned}
+$$
+
+Unlike linear regression, we can no longer write down the MLE in closed form, thus we need an optimization algorithm to compute it. The simplest algorithm for unconstrained optimization is gradient descent, also known as steepest descent. This is written as follows,
+
+$$\beta_{k+1} = \beta_k - \eta_k g_k$$
+
+where $\eta_k$ is the learning rate and $g_k$ is the gradient of the loss function. There are limitations of gradient descent. It can get stuck in a local minima, it is sensitive to initial condition, and for large dataset it is computationally expensive \cite{mehta2019high}. This can be overcome by adding stochasticity, for instance, by only taking the gradient of a subset of data called mini-batches. 
+
+\subsubsection{Stochastic Gradient descent with mini-batches}
+If there are n samples in total, and the mini-batch size set is M, there are n/M possible mini-batches $B_k $ where $k \in (1,2,..n/M)$. In this case, the gradient descent in each cycle over the mini batches is approximated by using a single mini-batch. The approximated gradient descent over a single batch is then used as a gradient in the update of the parameter. We denote the approximated gradient by, 
+$$
+\nabla_{\beta} C^{MB}(\beta) = \sum_{i\in B_k} \nabla_\beta c_i(\textbf{x}_i, \theta)
+$$
+
+The SGD with mini-batches equation is given by, 
+$$
+g_k = \eta \nabla_{\beta} C^{MB}(\beta) \\
+\beta_{k+1} = \beta_k - g_k
+$$
+
+\subsubsection{Support Vector Machine}\label{subsubsec:SVM}
