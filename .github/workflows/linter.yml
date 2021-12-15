@@ -61,3 +61,4 @@ jobs:
           VALIDATE_PYTHON_MYPY: false
           VALIDATE_BASH_EXEC: false
           VALIDATE_YAML: false
+          VALIDATE_LATEX: false
