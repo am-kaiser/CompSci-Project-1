@@ -53,15 +53,15 @@ def stochastic_gradient_descent_method(gradient, y, X, start, num_epoch, learn_r
     :param start: initial values
     :param num_epoch: number of epochs
     :param learn_rate: learn rate
-    :param num_min_batch. number of mini batches
+    :param num_min_batch: size of mini batches
     :param lmbda: When lam=0 it is OLS and otherwise ridge regression.
     :return: beta
     """
     vector = start.reshape(start.shape[0], 1)
     num_observations = X.shape[0]
     for _ in range(num_epoch):
-        for _ in range(num_min_batch):
-            batch_index = np.random.randint(num_observations, size=int(num_observations / num_min_batch))
+        for _ in range(int(num_observations / num_min_batch)):
+            batch_index = np.random.randint(num_observations, size=num_min_batch)
             X_batch = X[batch_index, :]
             y_batch = y[batch_index]
             descend = learn_rate * gradient(y=y_batch, X=X_batch, beta=vector, lmbda=lmbda)

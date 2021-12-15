@@ -12,7 +12,7 @@ def plot_heatmap_conf_matrix(reg_type, l2_lambda, learn_rate, num_min_batch, epo
     :param reg_type: logistic regression or support vector machine
     :param l2_lambda: L2 regularization parameter
     :param learn_rate: learn rate for stochastic gradient descent
-    :param num_min_batch: number of mini batches for stochastic gradient descent
+    :param num_min_batch: size of mini batches for stochastic gradient descent
     :param epoch: number of epochs for stochastic gradient descent
     :param test_ratio: ratio of data used as a test dataset
     :param k_fold: number of folds to be used with cross-validation
@@ -94,7 +94,7 @@ def plot_accuracy(reg_type, l2_lambda, learn_rate, num_min_batch, epoch, test_ra
     :param reg_type: logistic regression with or without cross-validation
     :param l2_lambda: L2 regularization parameter
     :param learn_rate: learn rate for stochastic gradient descent
-    :param num_min_batch: number of mini batches for stochastic gradient descent
+    :param num_min_batch: size of mini batches for stochastic gradient descent
     :param epoch: number of epochs for stochastic gradient descent
     :param test_ratio: ratio of data used as a test dataset
     :param k_fold: number of folds to be used with cross-validation

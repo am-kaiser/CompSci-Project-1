@@ -195,7 +195,7 @@ def apply_regression_sgd(order, num_points, noise_var, test_ratios=np.zeros(1), 
     :param n_boots: number of bootstraps
     :param k_folds: number of folds to be used in cross-validation
     :param learn_rate: learn rate for stochastic gradient descent
-    :param num_min_batch: number of mini batches for stochastic gradient descent
+    :param num_min_batch: size of mini batches for stochastic gradient descent
     :param epochs: number of epochs for stochastic gradient descent
     """
     # applies regression for multiple parameter combos
@@ -416,9 +416,6 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
     k_folds = np.load(data_path + "k_folds.npy")
     n_boots = np.load(data_path + "n_boots.npy")
     lasso_lambda = np.load(data_path + "lasso_lambda.npy")
-    learn_rates = np.load(data_path + "learn_rates.npy")
-    num_mini_batches = np.load(data_path + "num_min_batches.npy")
-    epochs = np.load(data_path + "epochs.npy")
 
     # Load data for statistical indicator
     data = get_data_statistic(data_path, stat, method)
@@ -459,10 +456,8 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
     if "lasso" not in method:
         llambda_ind = 0
 
-
     # Select subset of data for given ratio, lambda, number of bootstraps and/or folds for cross-validation and plot heatmap
     data_sub = data[:, n_ind, :, r_ind, rlambda_ind, llambda_ind, nb_ind, cv_ind]
-    
 
     sns.heatmap(data_sub, annot=True, cmap="mako", vmax=np.amax(data_sub), vmin=np.amin(data_sub), xticklabels=noise_var,
                 yticklabels=order)
@@ -484,7 +479,7 @@ def plot_stat_sgd(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000
     :param lasso_lmb: lambda for lasso regression
     :param epoch: number of epochs for stochastic gradient descent
     :param learn_rate: learn rate for stochastic gradient descent
-    :param batch: number of mini batches for stochastic gradient descent
+    :param batch: size of mini batches for stochastic gradient descent
     """
     # Path to example data
     data_path = get_data_path_sgd()

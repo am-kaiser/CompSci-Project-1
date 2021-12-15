@@ -1,0 +1,42 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{siunitx}
+
+
+\title{CompSci Project 1}
+\author{Amandine Kaiser, Anthony Val Compasano, Harish P Jain}
+\date{December 2021}
+
+\begin{document}
+\setlength{\parindent}{0em} 
+\maketitle
+\newpage
+%------------------------------------------------------------------------
+\include{abstract}
+%------------------------------------------------------------------------
+\tableofcontents
+\newpage
+%------------------------------------------------------------------------
+\input{introduction}
+
+\section{Linear Regression} \label{sec:linear_regression}
+\input{method_linear_regression}
+\input{data_linear_regression}
+\input{results_linear_regression}
+
+\section{Logistic Regression} \label{sec:logistic_regression}
+\input{method_logistic_regression}
+
+\input{data_logistic_regression}
+\input{results_logistic_regression}
+
+\input{summary}
+%------------------------------------------------------------------------
+\newpage
+\bibliographystyle{plain} 
+\bibliography{references}
+\end{document}
