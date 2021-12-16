@@ -3,8 +3,8 @@
 This repository contains scripts to perform regression analysis and apply resampling methods. This repository was setup for project 1 of the lecture Computational Physics and Machine Learning.
 
 ## More information:
-* [Task Description](documentation/Project1.pdf)
-* [Report]()
+* [Task Description](documentation/Project1_task_description.pdf)
+* [Report](documentation/report/main.pdf)
 
 ## How to setup
 Run one of the following lines depending on your use case.
