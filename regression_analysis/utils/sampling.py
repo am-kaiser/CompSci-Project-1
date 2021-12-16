@@ -8,10 +8,8 @@ def bootstrap(x, y, sample_ratio):
     """
     n = np.size(y)
     sample_size = int(np.ceil((1 - sample_ratio) * n))
-    train_ind = np.zeros(sample_size, dtype=int)
     ind = np.arange(0, n)
     train_ind = npr.choice(ind, sample_size)
-    # test_ind = npr.choice(np.delete(ind, train_ind), n-sample_size)
     test_ind = np.delete(ind, train_ind)
 
     x_train = x[train_ind]
