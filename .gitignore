@@ -131,3 +131,12 @@ dmypy.json
 # PyCharm
 .idea
 .vscode
+
+# LaTEX files
+.aux
+.bbl
+.blg
+.log
+.out
+main.synctex.gz
+.toc

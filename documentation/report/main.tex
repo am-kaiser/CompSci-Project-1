@@ -5,36 +5,36 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{siunitx}
-
-
-\title{CompSci Project 1}
-\author{Amandine Kaiser, Anthony Val Compasano, Harish P Jain}
-\date{December 2021}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{multirow}
 
 \begin{document}
 \setlength{\parindent}{0em} 
-\maketitle
+\include{sections/title}
 \newpage
 %------------------------------------------------------------------------
-\include{abstract}
+\include{sections/abstract}
 %------------------------------------------------------------------------
 \tableofcontents
 \newpage
 %------------------------------------------------------------------------
-\input{introduction}
+\input{sections/introduction}
 
 \section{Linear Regression} \label{sec:linear_regression}
-\input{method_linear_regression}
-\input{data_linear_regression}
-\input{results_linear_regression}
+\input{sections/method_linear_regression}
+\input{sections/data_linear_regression}
+\input{sections/results_linear_regression}
 
-\section{Logistic Regression} \label{sec:logistic_regression}
-\input{method_logistic_regression}
+\section{Classification} \label{sec:logistic_regression}
+\input{sections/method_logistic_regression}
+\input{sections/data_logistic_regression}
+%\input{sections/results_logistic_regression}
 
-\input{data_logistic_regression}
-\input{results_logistic_regression}
+\input{sections/summary}
 
-\input{summary}
+\input{sections/acknowledgement}
 %------------------------------------------------------------------------
 \newpage
 \bibliographystyle{plain} 
