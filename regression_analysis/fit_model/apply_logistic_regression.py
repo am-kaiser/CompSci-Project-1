@@ -87,6 +87,7 @@ def plot_heatmap_conf_matrix(reg_type, l2_lambda, learn_rate, num_min_batch, epo
         sns.heatmap(logistic_reg.test_confusion_matrix, annot=True, cmap="mako", yticklabels=['is_malignant', 'is_benign'],
                     xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax2)
 
+
 def plot_heatmap_conf_matrix_percent(reg_type, l2_lambda, learn_rate, num_min_batch, epoch, test_ratio, k_fold):
     """
     Plot confusion matrices
@@ -119,8 +120,8 @@ def plot_heatmap_conf_matrix_percent(reg_type, l2_lambda, learn_rate, num_min_ba
 
         df_train = logistic_reg.train_confusion_matrix
         df_test = logistic_reg.test_confusion_matrix
-        train_cm = df_train.div(df_train.sum(axis=1),axis=0).round(2)
-        test_cm = df_test.div(df_test.sum(axis=1),axis=0).round(2)
+        train_cm = df_train.div(df_train.sum(axis=1), axis=0).round(2)
+        test_cm = df_test.div(df_test.sum(axis=1), axis=0).round(2)
 
         sns.heatmap(train_cm, annot=True, cmap="mako",
                     yticklabels=['is_malignant', 'is_benign'],
@@ -134,8 +135,8 @@ def plot_heatmap_conf_matrix_percent(reg_type, l2_lambda, learn_rate, num_min_ba
 
         df_train = logistic_reg.train_confusion_matrix
         df_test = logistic_reg.test_confusion_matrix
-        train_cm = df_train.div(df_train.sum(axis=1),axis=0).round(2)
-        test_cm = df_test.div(df_test.sum(axis=1),axis=0).round(2)
+        train_cm = df_train.div(df_train.sum(axis=1), axis=0).round(2)
+        test_cm = df_test.div(df_test.sum(axis=1), axis=0).round(2)
 
         sns.heatmap(train_cm, annot=True, cmap="mako",
                     yticklabels=['is_malignant', 'is_benign'],
@@ -146,11 +147,11 @@ def plot_heatmap_conf_matrix_percent(reg_type, l2_lambda, learn_rate, num_min_ba
 
     elif reg_type == "svm":
         logistic_reg.apply_logistic_regression(test_ratio=test_ratio, reg_method="svm")
-        
+
         df_train = logistic_reg.train_confusion_matrix
         df_test = logistic_reg.test_confusion_matrix
-        train_cm = df_train.div(df_train.sum(axis=1),axis=0).round(2)
-        test_cm = df_test.div(df_test.sum(axis=1),axis=0).round(2)
+        train_cm = df_train.div(df_train.sum(axis=1), axis=0).round(2)
+        test_cm = df_test.div(df_test.sum(axis=1), axis=0).round(2)
 
         sns.heatmap(train_cm, annot=True, cmap="mako",
                     yticklabels=['is_malignant', 'is_benign'],
@@ -163,11 +164,11 @@ def plot_heatmap_conf_matrix_percent(reg_type, l2_lambda, learn_rate, num_min_ba
         logistic_reg.apply_logistic_regression_crossvalidation(kfolds=k_fold, reg_method="logistic_sgd",
                                                                lmbda=l2_lambda, num_epoch=epoch, learn_rate=learn_rate,
                                                                num_min_batch=num_min_batch)
-        
+
         df_train = logistic_reg.train_confusion_matrix
         df_test = logistic_reg.test_confusion_matrix
-        train_cm = df_train.div(df_train.sum(axis=1),axis=0).round(2)
-        test_cm = df_test.div(df_test.sum(axis=1),axis=0).round(2)
+        train_cm = df_train.div(df_train.sum(axis=1), axis=0).round(2)
+        test_cm = df_test.div(df_test.sum(axis=1), axis=0).round(2)
 
         sns.heatmap(train_cm, annot=True, cmap="mako",
                     yticklabels=['is_malignant', 'is_benign'],
@@ -181,8 +182,8 @@ def plot_heatmap_conf_matrix_percent(reg_type, l2_lambda, learn_rate, num_min_ba
 
         df_train = logistic_reg.train_confusion_matrix
         df_test = logistic_reg.test_confusion_matrix
-        train_cm = df_train.div(df_train.sum(axis=1),axis=0).round(2)
-        test_cm = df_test.div(df_test.sum(axis=1),axis=0).round(2)
+        train_cm = df_train.div(df_train.sum(axis=1), axis=0).round(2)
+        test_cm = df_test.div(df_test.sum(axis=1), axis=0).round(2)
 
         sns.heatmap(train_cm, annot=True, cmap="mako",
                     yticklabels=['is_malignant', 'is_benign'],
@@ -196,8 +197,8 @@ def plot_heatmap_conf_matrix_percent(reg_type, l2_lambda, learn_rate, num_min_ba
 
         df_train = logistic_reg.train_confusion_matrix
         df_test = logistic_reg.test_confusion_matrix
-        train_cm = df_train.div(df_train.sum(axis=1),axis=0).round(2)
-        test_cm = df_test.div(df_test.sum(axis=1),axis=0).round(2)
+        train_cm = df_train.div(df_train.sum(axis=1), axis=0).round(2)
+        test_cm = df_test.div(df_test.sum(axis=1), axis=0).round(2)
 
         sns.heatmap(train_cm, annot=True, cmap="mako",
                     yticklabels=['is_malignant', 'is_benign'],
@@ -205,6 +206,7 @@ def plot_heatmap_conf_matrix_percent(reg_type, l2_lambda, learn_rate, num_min_ba
         sns.heatmap(test_cm, annot=True, cmap="mako",
                     yticklabels=['is_malignant', 'is_benign'],
                     xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax2)
+
 
 def plot_accuracy(reg_type, l2_lambda, learn_rate, num_min_batch, epoch, test_ratio, k_fold):
     """

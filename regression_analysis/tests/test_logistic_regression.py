@@ -23,6 +23,6 @@ class TestSGDMethod(unittest.TestCase):
         self.assertAlmostEqual(a, 4)
         self.assertAlmostEqual(b, 3)
 
-    
+
 if __name__ == '__main__':
     unittest.main()
