@@ -406,7 +406,6 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
     # Path to example data
     data_path = get_data_path()
 
-
     # Load data
     order = np.load(data_path + "order.npy")
     num_points = np.load(data_path + "num_points.npy")
@@ -466,7 +465,7 @@ def plot_stat(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_
 
 
 def plot_stat_sgd(ratio=0.1, num=100, stat="test MSE", method="ols", n_boot=1000, k_fold=1000, ridge_lmb=122.0, lasso_lmb=112.2, learn_rate=0.1,
-              batch=5, epoch=50):
+                  batch=5, epoch=50):
     """
     Create heatmap for given statistical indicator and sampling method
     :param ratio: ratio of the dataset to be used for testing

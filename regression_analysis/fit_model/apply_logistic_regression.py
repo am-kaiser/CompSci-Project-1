@@ -88,6 +88,126 @@ def plot_heatmap_conf_matrix(reg_type, l2_lambda, learn_rate, num_min_batch, epo
                     xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax2)
 
 
+def plot_heatmap_conf_matrix_percent(reg_type, l2_lambda, learn_rate, num_min_batch, epoch, test_ratio, k_fold):
+    """
+    Plot confusion matrices
+    :param reg_type: logistic regression or support vector machine
+    :param l2_lambda: L2 regularization parameter
+    :param learn_rate: learn rate for stochastic gradient descent
+    :param num_min_batch: size of mini batches for stochastic gradient descent
+    :param epoch: number of epochs for stochastic gradient descent
+    :param test_ratio: ratio of data used as a test dataset
+    :param k_fold: number of folds to be used with cross-validation
+    """
+    # Load data
+    input_data = logistic_regression.load_data()
+    X_obs = logistic_regression.normalise_data(logistic_regression.design_matrix(input_data))
+    y_in = input_data.diagnosis.values
+
+    # Create regression object
+    logistic_reg = logistic_regression.LogisticRegression(X_obs, y_in)
+
+    # Create empty plot
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+    fig.tight_layout()
+    ax1.title.set_text('Train Data')
+    ax2.title.set_text('Test Data')
+
+    # Plot confusion matrix for given input
+    if reg_type == "logistic_sgd":
+        logistic_reg.apply_logistic_regression(test_ratio=test_ratio, reg_method="logistic_sgd", lmbda=l2_lambda, num_epoch=epoch,
+                                               learn_rate=learn_rate, num_min_batch=num_min_batch)
+
+        df_train = logistic_reg.train_confusion_matrix
+        df_test = logistic_reg.test_confusion_matrix
+        train_cm = df_train.div(df_train.sum(axis=1), axis=0).round(2)
+        test_cm = df_test.div(df_test.sum(axis=1), axis=0).round(2)
+
+        sns.heatmap(train_cm, annot=True, cmap="mako",
+                    yticklabels=['is_malignant', 'is_benign'],
+                    xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax1)
+        sns.heatmap(test_cm, annot=True, cmap="mako",
+                    yticklabels=['is_malignant', 'is_benign'],
+                    xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax2)
+
+    elif reg_type == "logistic_scikit":
+        logistic_reg.apply_logistic_regression(test_ratio=test_ratio, reg_method="logistic_scikit")
+
+        df_train = logistic_reg.train_confusion_matrix
+        df_test = logistic_reg.test_confusion_matrix
+        train_cm = df_train.div(df_train.sum(axis=1), axis=0).round(2)
+        test_cm = df_test.div(df_test.sum(axis=1), axis=0).round(2)
+
+        sns.heatmap(train_cm, annot=True, cmap="mako",
+                    yticklabels=['is_malignant', 'is_benign'],
+                    xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax1)
+        sns.heatmap(test_cm, annot=True, cmap="mako",
+                    yticklabels=['is_malignant', 'is_benign'],
+                    xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax2)
+
+    elif reg_type == "svm":
+        logistic_reg.apply_logistic_regression(test_ratio=test_ratio, reg_method="svm")
+
+        df_train = logistic_reg.train_confusion_matrix
+        df_test = logistic_reg.test_confusion_matrix
+        train_cm = df_train.div(df_train.sum(axis=1), axis=0).round(2)
+        test_cm = df_test.div(df_test.sum(axis=1), axis=0).round(2)
+
+        sns.heatmap(train_cm, annot=True, cmap="mako",
+                    yticklabels=['is_malignant', 'is_benign'],
+                    xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax1)
+        sns.heatmap(test_cm, annot=True, cmap="mako",
+                    yticklabels=['is_malignant', 'is_benign'],
+                    xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax2)
+
+    elif reg_type == "logistic_sgd_crossvalidation":
+        logistic_reg.apply_logistic_regression_crossvalidation(kfolds=k_fold, reg_method="logistic_sgd",
+                                                               lmbda=l2_lambda, num_epoch=epoch, learn_rate=learn_rate,
+                                                               num_min_batch=num_min_batch)
+
+        df_train = logistic_reg.train_confusion_matrix
+        df_test = logistic_reg.test_confusion_matrix
+        train_cm = df_train.div(df_train.sum(axis=1), axis=0).round(2)
+        test_cm = df_test.div(df_test.sum(axis=1), axis=0).round(2)
+
+        sns.heatmap(train_cm, annot=True, cmap="mako",
+                    yticklabels=['is_malignant', 'is_benign'],
+                    xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax1)
+        sns.heatmap(test_cm, annot=True, cmap="mako",
+                    yticklabels=['is_malignant', 'is_benign'],
+                    xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax2)
+
+    elif reg_type == "logistic_scikit_crossvalidation":
+        logistic_reg.apply_logistic_regression_crossvalidation(kfolds=k_fold, reg_method="logistic_scikit")
+
+        df_train = logistic_reg.train_confusion_matrix
+        df_test = logistic_reg.test_confusion_matrix
+        train_cm = df_train.div(df_train.sum(axis=1), axis=0).round(2)
+        test_cm = df_test.div(df_test.sum(axis=1), axis=0).round(2)
+
+        sns.heatmap(train_cm, annot=True, cmap="mako",
+                    yticklabels=['is_malignant', 'is_benign'],
+                    xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax1)
+        sns.heatmap(test_cm, annot=True, cmap="mako",
+                    yticklabels=['is_malignant', 'is_benign'],
+                    xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax2)
+
+    elif reg_type == "svm_crossvalidation":
+        logistic_reg.apply_logistic_regression_crossvalidation(kfolds=k_fold, reg_method="svm")
+
+        df_train = logistic_reg.train_confusion_matrix
+        df_test = logistic_reg.test_confusion_matrix
+        train_cm = df_train.div(df_train.sum(axis=1), axis=0).round(2)
+        test_cm = df_test.div(df_test.sum(axis=1), axis=0).round(2)
+
+        sns.heatmap(train_cm, annot=True, cmap="mako",
+                    yticklabels=['is_malignant', 'is_benign'],
+                    xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax1)
+        sns.heatmap(test_cm, annot=True, cmap="mako",
+                    yticklabels=['is_malignant', 'is_benign'],
+                    xticklabels=['predicted_malignent', 'predicted_benign'], ax=ax2)
+
+
 def plot_accuracy(reg_type, l2_lambda, learn_rate, num_min_batch, epoch, test_ratio, k_fold):
     """
     Plot accuracy for test and train data given Logistic Regression with stochastic gradient descent

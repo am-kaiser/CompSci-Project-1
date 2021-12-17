@@ -66,7 +66,7 @@ def find_logistic_model_parameter(design_matrix, y_input, method, lam, num_epoch
     elif method == "logistic_scikit":
         parameter = linear_model.LogisticRegression(fit_intercept=False).fit(design_matrix, np.ravel(y_input)).coef_.T  # penalty???
     elif method == "svm":
-        parameter = svm.SVC(kernel='linear').fit(design_matrix, np.ravel(y_input)).coef_.T
+        parameter = svm.SVC(kernel='linear').fit(design_matrix, np.ravel(y_input))
 
     return parameter
 
@@ -118,26 +118,44 @@ class LogisticRegression:
             y_train = self.y
             y_test = np.array([])
 
-        # Find model parameters
-        beta = find_logistic_model_parameter(x_train, y_train, reg_method, lmbda, num_epoch, learn_rate, num_min_batch)
-        # Fit training data
-        y_model_train = np.array(x_train @ beta)
-        # transform y_model_train to be either 0 or 1
-        y_model_train = transform_0_1(y_model_train)
-        # Calculate accuracy for training data
-        self.train_accuracy = np.mean(y_train == y_model_train)
-        # Calculate confusion matrix
-        self.train_confusion_matrix = make_confusion_matrix(y_train, y_model_train)
-
-        if test_ratio != 0.0:
-            # Fit model to testing data
-            y_model_test = np.array(x_test @ beta)
-            # transform y_model_test to be either 0 or 1
-            y_model_test = transform_0_1(y_model_test)
+        if reg_method == 'svm':
+            # Find model parameters
+            svm = find_logistic_model_parameter(x_train, y_train, reg_method, lmbda, num_epoch, learn_rate, num_min_batch)
+            # Predict using training data
+            y_model_train = svm.predict(x_train)[:, np.newaxis]
             # Calculate accuracy for training data
-            self.test_accuracy = np.mean(y_test == y_model_test)
+            self.train_accuracy = np.mean(y_train == y_model_train)
             # Calculate confusion matrix
-            self.test_confusion_matrix = make_confusion_matrix(y_test, y_model_test)
+            self.train_confusion_matrix = make_confusion_matrix(y_train, y_model_train)
+
+            if test_ratio != 0.0:
+                # Predict using testing data
+                y_model_test = svm.predict(x_test)[:, np.newaxis]
+                # Calculate accuracy for training data
+                self.test_accuracy = np.mean(y_test == y_model_test)
+                # Calculate confusion matrix
+                self.test_confusion_matrix = make_confusion_matrix(y_test, y_model_test)
+        else:
+            # Find model parameters
+            beta = find_logistic_model_parameter(x_train, y_train, reg_method, lmbda, num_epoch, learn_rate, num_min_batch)
+            # Fit training data
+            y_model_train = np.array(x_train @ beta)
+            # transform y_model_train to be either 0 or 1
+            y_model_train = transform_0_1(y_model_train)
+            # Calculate accuracy for training data
+            self.train_accuracy = np.mean(y_train == y_model_train)
+            # Calculate confusion matrix
+            self.train_confusion_matrix = make_confusion_matrix(y_train, y_model_train)
+
+            if test_ratio != 0.0:
+                # Fit model to testing data
+                y_model_test = np.array(x_test @ beta)
+                # transform y_model_test to be either 0 or 1
+                y_model_test = transform_0_1(y_model_test)
+                # Calculate accuracy for training data
+                self.test_accuracy = np.mean(y_test == y_model_test)
+                # Calculate confusion matrix
+                self.test_confusion_matrix = make_confusion_matrix(y_test, y_model_test)
 
     def apply_logistic_regression_crossvalidation(self, kfolds=None, reg_method=None, lmbda=None, num_epoch=None, learn_rate=None,
                                                   num_min_batch=None):
@@ -162,14 +180,21 @@ class LogisticRegression:
             y_train = y_train_arr[k, :].reshape(len(y_train_arr[k, :]), 1)
             y_test = y_test_arr[k, :].reshape(len(y_test_arr[k, :]), 1)
 
-            # finding model parameters
-            beta = find_logistic_model_parameter(x_train, y_train, reg_method, lmbda, num_epoch, learn_rate, num_min_batch)
-            # Fit model for test and train data
-            y_model_test = np.array(x_test @ beta)
-            y_model_train = np.array(x_train @ beta)
-            # transform y's to be either 0 or 1
-            y_model_test = transform_0_1(y_model_test)
-            y_model_train = transform_0_1(y_model_train)
+            if reg_method == 'svm':
+                # finding model parameters
+                svm = find_logistic_model_parameter(x_train, y_train, reg_method, lmbda, num_epoch, learn_rate, num_min_batch)
+                # Fit model for test and train data
+                y_model_test = svm.predict(x_test)[:, np.newaxis]
+                y_model_train = svm.predict(x_train)[:, np.newaxis]
+            else:
+                # finding model parameters
+                beta = find_logistic_model_parameter(x_train, y_train, reg_method, lmbda, num_epoch, learn_rate, num_min_batch)
+                # Fit model for test and train data
+                y_model_test = np.array(x_test @ beta)
+                y_model_train = np.array(x_train @ beta)
+                # transform y's to be either 0 or 1
+                y_model_test = transform_0_1(y_model_test)
+                y_model_train = transform_0_1(y_model_train)
             # Calculate error statistics
             self.train_accuracy += np.mean(y_train == y_model_train)
             self.test_accuracy += np.mean(y_test == y_model_test)
