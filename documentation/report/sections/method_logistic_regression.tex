@@ -1,13 +1,13 @@
 \subsection{Method} \label{subsec:method_logistic_regression}
 
-The goal of classification is to assign an input vector $\bold{x}$ to one of K classes $y_k$ where $k=0,1,...,K$. Linear regression can be extended to classification by two changes \cite{murphy_machine_2012}. First is the change of the Gaussian distribution for $y$ with a Bernoulli distribution, for the case of binary response, $y \in \{0,1\}$. 
+The goal of classification is to assign an input vector $\bold{x}$ to one of K classes $\mathcal{C}_k$ where $k=0,1,...,K$. Linear regression can be extended to binary classification by two changes \cite{murphy_machine_2012}. First is the change of the Gaussian distribution for $y$ with a Bernoulli distribution, for the case of binary response, $y_i \in \{0,1\}$. 
 
 \begin{align}
-     p(y \mid \mathbf{x}, \beta)&=Ber(y \mid p(1\mid x))) \\
-        &= p^{y}\left(y=1\mid  \mathbf{x}, \beta \right)\left(1-p(y=1\mid  \mathbf{x}, \beta )\right)^{1-y}
+     p(y \mid \mathbf{x}, \boldsymbol{\beta})&=Ber(y \mid p(y=1\mid \boldsymbol{x},\boldsymbol{\beta}))) \\
+        &= p^{y}\left(y=1\mid  \mathbf{x}, \boldsymbol{\beta} \right)\left(1-p(y=1\mid  \mathbf{x}, \boldsymbol{\beta} )\right)^{1-y}
 \end{align}
 
-Second is to pass the linear combination of the inputs to a function that ensures $0 \leq \mu(x)\leq 1$. This is achieved by using a logit function also known as sigmoid function, $p(y=1\mid \bold{x}, \bold{\beta}) = sigm(\mathbf{\bold{\beta}^T \bold{x}})=\mu_i$. 
+Second is to pass the linear combination of the inputs and parameters to a function that outputs in the range $[0,1]$. This is achieved by using a logit function also known as sigmoid function, $p(y=1\mid \bold{x}, \boldsymbol{\beta}) = sigm(\boldsymbol{\beta}^T \bold{x})$. 
 \newline\newline
 We define sigmoid function as,
 \begin{equation}
@@ -16,27 +16,26 @@ We define sigmoid function as,
 
 
 Putting these two steps together we get,
+\begin{equation}
+    p(y \mid \mathbf{x}, \boldsymbol{\beta})=Ber(y|sigm(\boldsymbol{\beta}^T \mathbf{x})))
+\end{equation}
+For a multivariate set of data $\mathcal{D} = \{y_i, \mathbf{x_i}\}$ with $y_i$ being a binary response $y_i \in \{0,1\}$ and $\mathbf{x_i}$ is a vector of size $1\times n$ where n is the number of features, the likelihood for all possible outcome is, 
 \begin{equation}\label{eq:likelihood}
-    p(y \mid \mathbf{x}, \beta)=Ber(y|sigm(\mathbf{\beta^T x})))
+    P(\mathcal{D}\mid \boldsymbol{\beta}) =  \Pi_i p(y_i \mid \mathbf{x}_i, \boldsymbol{\beta})
 \end{equation}
-For a multivariate set of data $\mathcal{D} = \{y_i, \mathbf{x_i}\}$ with $y_i$ being a binary response $y_i \in \{0,1\}$, the likelihood for all possible outcome is, 
+
+From maximum likelihood estimation principle, the most probable observed data can be obtained from the maximum log-likelihood function where we maximizes with respect to $\boldsymbol\beta$. The log-likelihood for equation (\ref{eq:likelihood}) is given by,
 \begin{equation}
-    P(\mathcal{D}\mid \beta) =  \Pi_i p(y \mid \mathbf{x}, \beta)
-\end{equation}
-The negative log-likelihood for logistic regression then given by,
-
-
-\begin{equation}
-  \mathrm{NLL}(\mathbf{\mathbf{\beta}}) =-\sum_{i=1}^{N}\left[y_{i} \log \mu_{i}(\beta)+\left(1-y_{i}\right) \log \left(1-\mu_{i}(\beta)\right)\right]
+  \mathrm{LL}(\boldsymbol{\beta}) =\sum_{i=1}^{N}\left[y_{i} \log p(y=1\mid  \mathbf{x}, \boldsymbol{\beta} )+\left(1-y_{i}\right) \log \left(1-p(y=1\mid  \mathbf{x}, \boldsymbol{\beta} )\right)\right]
 \end{equation}
 
-This is also known as the cross-entropy error function. For logistic regression, the cost function is just the negative log-likelihood. 
+For logistic regression, the cost function is just the negative log-likelihood. We want a cost function to be minimized hence a negative sign on the log-likelihood.
+
 \begin{align}
-      C(\beta) &= \mathrm{NLL}(\mathbf{\mathbf{\beta}})\\
-             &=-\sum_{i=1}^{N}\left[y_{i} \log \mu_{i}(\beta)+\left(1-y_{i}\right) \log \left(1-\mu_{i}(\beta)\right)\right]
+      C(\boldsymbol{\beta}) =-\sum_{i=1}^{N}\left[y_{i} \log p(y=1\mid  \mathbf{x}, \boldsymbol{\beta} )+\left(1-y_{i}\right) \log \left(1-p(y=1\mid  \mathbf{x}, \boldsymbol{\beta} )\right)\right]
 \end{align}
 
-Unlike linear regression, the maximum likelihood estimate (MLE) for the parameters is no longer in closed form, so we need an optimization algorithm to compute it. One famous simple algorithm for unconstrained optimization is gradient descent, also known as steepest descent. It is given as follows,
+This is also known as the cross-entropy error function. Unlike linear regression, the maximum likelihood estimate (MLE) for the parameters is no longer in closed form, so we need an optimization algorithm to compute it. One famous simple algorithm for unconstrained optimization is gradient descent, also known as steepest descent. It is given as follows,
 
 
 \begin{align}
@@ -44,9 +43,23 @@ Unlike linear regression, the maximum likelihood estimate (MLE) for the paramete
     \beta_{k+1} &= \beta_k - \eta_k g_k
 \end{align}
 
-where $\eta_k$ is the learning rate, and $g_k$ is the gradient of the loss function with respect to $\mathcal{\beta}$. There are limitations of gradient descent. It can get stuck in local minima, it is sensitive to the initial condition, and for a large dataset, it is computationally expensive \cite{mehta2019high}. It is alleviated through stochasticity, for instance, by only taking the gradient of a subset of data called mini-batches. 
+where $\eta_k$ is the learning rate, and $g_k$ is the gradient of the loss function with respect to $\mathcal{\beta}$.  Several hyperparameters can be utilized in controlling the training. We use the following tuning parameters in our code: learning rate, number of epochs, and number of batches. Learning rate is just the step size on each iteration as it approaches the minimum of the cost function. The number of batches is the number of samples processed before updating the learnable parameter. And the number of the epoch is a complete cycle over the training data. After completing one epoch, the optimal parameter $\boldsymbol{\beta}$ can be obtained. This can be used to calculate a continuous response $t =\boldsymbol{X}^T \boldsymbol\beta$. If we set a threshold value for $t$ we can create a decision rule. In our case, we use the following decision rule:
 
-\subsubsection{Stochastic Gradient descent with mini-batches}
+\begin{equation}
+    \hat{y}=\begin{cases}
+        1 & \text{ if } t \geq 0 \\
+        0 & \text{ if } t < 0
+    \end{cases}
+\end{equation}
+
+
+
+
+
+
+There are limitations of gradient descent. It can get stuck in local minima, it is sensitive to the initial condition, and for a large dataset, it is computationally expensive \cite{mehta2019high}. It is alleviated through stochasticity, for instance, by only taking the gradient of a subset of data called mini-batches. 
+
+\subsubsection{Stochastic Gradient descent with mini-batches}\label{subsec:SGD}
 If there are n samples in total, and the mini-batch size set is M, there are n/M possible mini-batches $B_k $ where $k \in (1,2,..n/M)$. In this case, the gradient descent is approximated in each cycle over the mini-batches using a single mini-batch. The approximated gradient descent over a single batch , $c_i(\mathbf{x_i},\beta)$, is the gradient used to update the parameter. We denote the approximated gradient by $\nabla_\beta C^{MB}(\beta)$ written as, 
 
 \begin{equation}
@@ -62,7 +75,5 @@ The SGD with mini-batches equation is given by,
 \end{align}
 
 
-\textcolor{red}{Can you explain what each of the terms in the equations mean? What is $C^{MB}$, what is $c_i$, and all other such terms. More details is definitely required in section 3.1 and 3.1.1. The symbols in equations in section 3.1 are also to be explained. Also, if you add equations that take their own line do not use double dollar characters. Instead use the begin equation thing. It'll add equation numbering too. You can check this in methods of linear regression.}
-
 \subsubsection{Support Vector Machine}\label{subsubsec:SVM}
-Fundamentally support vector machine (SVM) is a two-class classifier. Since the problem at hand is consists of two classes, benign and malignant, it would be best to test SVM on the cancer data. SVM classifier determines a decision boundary by choosing parameters that maximize the margin. This constraint optimization problem is solved using Lagrange multipliers that follow Karush-Kuhn-Tucker conditions \cite{bishop2006pattern}. A dual representation of the Lagrangian form is expressed in terms of the kernel and obtained by taking the gradient of the Lagrangian form with respect to the parameters and setting this gradient to zero. The new data points are classified using the trained model by evaluating the signs of the output. To test SVM, we use scikit's built-in functionality. 
+Fundamentally support vector machine (SVM) is a two-class classifier. Since the problem at hand consists of two classes, benign and malignant, the Wisconsin breast cancer data is a good candidate to test SVM. SVM classifier determines a decision boundary by choosing parameters that maximize the margin. This constraint optimization problem is solved using Lagrange multipliers that follow Karush-Kuhn-Tucker conditions \cite{bishop2006pattern}. A dual representation of the Lagrangian form is expressed in terms of the kernel and obtained by taking the gradient of the Lagrangian form with respect to the parameters and setting this gradient to zero. The new data points are classified using the trained model by evaluating the signs of the output. To test SVM, we use scikit's built-in functionality. 
