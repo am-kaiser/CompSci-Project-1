@@ -2,13 +2,13 @@
 
 Consider that we have a data set of inputs and their corresponding output. Regression is a process of arriving at a relation between the independent input variables and the dependent output variables. In the field of statistical learning, regression is considered to be a supervised learning method. This is because the model parameters generated in regression are learned from labeled data which is data that comprises both inputs and their corresponding output, i.e the labels. In this report, we assume that there are multiple input variables and a single output variable for each member of the data set.
 \newline \newline
-The dataset with $n$ members is defined as $\mathcal{D} = [({x}_1, y_1 ), ({x}_2, y_2 ), ..., ({x}_n, y_n )]$. Where ${x}_i$ and $y_i$  are the $i^{th}$ input and output respectively. Let, $m$ be the number of components of the input such that ${x}_i := (x_{i1}, x_{i2}, ..., x_{im})$. In linear regression we assume that the data is of the form
+The dataset with $n$ members is defined as $\mathcal{D} := [({x}_1, y_1 ), ({x}_2, y_2 ), ..., ({x}_n, y_n )]$. Where ${x}_i$ and $y_i$  are the $i^{th}$ input and output respectively. Let, $m$ be the number of components of the input such that ${x}_i := (x_{i1}, x_{i2}, ..., x_{im})$. In linear regression we assume that the data is of the form
 \begin{equation}
     {y}_i = 1 \cdot\beta_0 + x_{i1}\beta_1 + x_{i2}\beta_2 + ... + x_{im}\beta_m + \epsilon_i \label{eq:lin_reg_data}
 \end{equation}
 where $\beta_0, \beta_1, \dots, \beta_m$ are unknown fixed regression parameters and $\epsilon_i$ is a random error or noise process consisting of independent identically (iid) normally distributed variables with mean zero and variance $\sigma^2$ \cite{shumway_time_2017}. Equation \ref{eq:lin_reg_data} can be rewritten as $y=\beta \phi(x) + \epsilon$ with
 \begin{equation}
-    \phi(x):=[1, x_{i,1}, x_{i,2}, \dots, x_{i,m}]
+    \phi(x):=[1, x_{i,1}, x_{i,2}, \dots, x_{i,m}].
 \end{equation}
 Moreover, it can be shown that $\mathbb{E}[y] = \beta \phi(x)$ and $var(y) = \sigma^2$. Therefore, $y \sim \mathcal{N}(\beta \phi(x),\,\sigma^{2})$ \cite{murphy_machine_2012}.
 \newline \newline
@@ -29,9 +29,7 @@ Moreover, we can express the set of predicted outputs as a vector which allows u
 \begin{equation}
     \hat{y} = {X}{\beta} \label{eq:lin_reg_matrix_model}
 \end{equation}
-where, $\hat{y}$, ${X}$ and ${\beta}$ have dimensions $n \times 1$, $n \times (m+1)$ and $(m+1) \times 1$.
-
-However, such a description is only useful if the output is a linear or near-linear function of the input variables.  We can make the model more "complex" by allowing higher powers of input variables and their products to be the features. One possibility is to consider polynomial functions of the input variables. For simplicity, we consider input vectors where $m=2$ as they are the only ones relevant for this project. Then, we can express the predicted output $\hat{y}$ as a polynomial function of order $p$ such that
+where, $\hat{y}$, ${X}$ and ${\beta}$ have dimensions $n \times 1$, $n \times (m+1)$ and $(m+1) \times 1$. $X$ is called design matrix. However, such a description is only useful if the output is a linear or near-linear function of the input variables.  We can make the model more "complex" by allowing higher powers of input variables and their products to be the features. One possibility is to consider polynomial functions of the input variables. For simplicity, we consider input vectors where $m=2$ as they are the only ones relevant for this project. Then, we can express the predicted output $\hat{y}$ as a polynomial function of order $p$ such that
 \begin{equation}
     \hat{y}_i = \beta_0 + \sum_{k=1}^{k=p}\sum_{l=0}^{l=p}\beta_{\frac{k(k+1)}{2}+l}x_{i1}^{p-l}x_{i2}^{l}
 \end{equation}
@@ -56,7 +54,7 @@ As mentioned before our aim is to find $\beta$ such that the cost function is mi
     \mathcal{C}(\beta) = \frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i(\beta))^2 = \frac{1}{n}( y -  {\hat y})^T( y -  {\hat y}) = \frac{1}{n}( y -  {X\beta})^T( y -  {X\beta}).
 \end{equation}
 
-The cost function is minimum when its gradient with respect to all parameters is 0, i.e.
+The cost function is at its minimum when its gradient with respect to all parameters is 0, i.e.
 \begin{equation*}
     \nabla_{\beta}\mathcal{C}(\beta) = X^T(y-X\beta) = 0.
 \end{equation*}
@@ -67,35 +65,36 @@ Assuming that $X$ has full column rank, and hence $X^T X$ is positive definite, 
 \end{equation}
 The cost function for a linear regression problem is convex. Hence, there is only one global extremum. This is not proven in this report.
 \newline \newline
-In the case where $X^T X$ is near singular or singular calculating pseudoinverse (specifically the
+In the case where $X^T X$ is near singular or singular calculating the pseudoinverse (specifically the
 Moore-Penrose inverse) is a very useful and well-known method. It calculates the inverse by using the Singular Value Decomposition algorithm. Moreover, this approach is more efficient than computing the regular inverse \cite{geron_hands-machine_2019}.
 \newline \newline
-An important step when calculating the best suited model for given input and output data is the splitting of the dataset$\mathcal{D}$ into a training dataset $\mathcal{D}_{train} = \{\boldsymbol{x}_{train}, y_{train}\}$ and a test dataset $\mathcal{D}_{test} = \{\boldsymbol{x}_{test}, y_{test}\}$. The ratio of number of data points in the $\mathcal{D}_{test}$ to the number of data points in the $\mathcal{D}_{train}$ is called the test ratio $r$. The model parameters are learned on the training dataset in the training phase. While, the performance of the model is assessed by various indicators that compare the output of fitting the model, on the input of the test set, with the the output of the test set. {\color{red}The test data set provides an unbiased evaluation of the fit of the model, which was trained on the training data set. Is this line necessary?} \newline
+An important step when calculating the best suited model for given input and output data is the splitting of the dataset $\mathcal{D}$ into a training dataset $\mathcal{D}_{train} = \{\boldsymbol{x}_{train}, y_{train}\}$ and a test dataset $\mathcal{D}_{test} = \{\boldsymbol{x}_{test}, y_{test}\}$. The ratio of the number of data points in the $\mathcal{D}_{test}$ to the number of data points in the $\mathcal{D}_{train}$ is called the test ratio $r$. The model parameters are learned on the training dataset in the training phase. While, the performance of the model is assessed by various indicators that compare the output of fitting the model, on the input of the test set, with the output of the test set. \newline
 
 Let the mean squared error(MSE) be 
 \begin{equation}
     MSE(y, \hat{y}) = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y_i})^2
 \end{equation}
-the squaring is important so that the positive and negative errors do not cancel each other. Certainly, the lower the value of MSE the closer is our prediction($\hat{y}$) to the ground truth($y$). The training MSE is given as $$MSE_{train} = MSE(y_{train}, \hat{y}_{train})$$ and the testing MSE as $$MSE_{test} = MSE(y_{test}, \hat{y}_{test})$$. 
+the squaring is important so that the positive and negative errors do not cancel each other. Certainly, the lower the value of MSE the closer is our prediction($\hat{y}$) to the ground truth($y$). The training MSE is given as $MSE_{train} = MSE(y_{train}, \hat{y}_{train})$ and the testing MSE as $MSE_{test} = MSE(y_{test}, \hat{y}_{test})$. 
 
 The MSE can be decomposed into bias and variance as 
 \begin{equation}
-    MSE = \underbrace{\mathbb{E}[(y - \mathbb{E}[\hat{y}])^2]}_{\text{bias}} + \underbrace{\mathbb{E}[(\hat{y} - \mathbb{E}[\hat{y}])^2]}_{\text{variance}}
+    MSE = \underbrace{\mathbb{E}[(y - \mathbb{E}[\hat{y}])^2]}_{\text{bias}} + \underbrace{\mathbb{E}[(\hat{y} - \mathbb{E}[\hat{y}])^2]}_{\text{variance}} + \sigma^2
 \end{equation}
 
-Let the $R^2$ error be 
+Let the $R^2$ score be 
 \begin{equation}
-    R^2(y, \hat{y}) = 1 - \frac{\sum_{i=1}^{n}|y_i-\hat{y}|^2}{\sum_{i=1}^{n}|y_i-\mathbb{E}[\hat{y}]|^2}
-\end{equation} and it measures the ability of the model to capture the true variance relative to the actual variance. The most optimum value when the model fits the data is 1. While, the least possible value of $R^2_{train}$ is 0, but $R^2_{test}$ can be negative.  
+    R^2(y, \hat{y}) = 1 - \frac{\sum_{i=1}^{n}(y_i-\hat{y})^2}{\sum_{i=1}^{n}(y_i-\mathbb{E}[\hat{y}])^2}.
+\end{equation} 
+It measures the ability of the model to capture the true variance relative to the actual variance. When the model fits the data perfectly $R^2=1$. While, the least possible value of $R^2_{train}$ is 0, but $R^2_{test}$ can be negative.  
 
 The difference in the MSE values  for the training and testing set determines the degree of generalization of the model from trained data to new unseen data. The average generalization error is \cite{mehta2019high}
 \begin{equation*}
     |MSE_{train} - MSE_{test}| = 2\sigma^2\frac{m}{n}.
 \end{equation*}
-If $m >> n$ then the model is not generalising, i.e. learning. In addition, the error can be large if the intrinsic noise $\sigma^2$ in the data is large. To counter this problem, regularisation is performed. In regularisation, the parameter values are penalized. In ridge regression, the $L^2$ norm of the parameter vector is penalized and in Lasso regression, the $L^1$ norm of the parameter vector is penalized. This is done by modifying the cost functions as follows
+If $m >> n$ then the model is not generalising, i.e. learning. In addition, the error can be large if the intrinsic noise $\sigma^2$ in the data is large. To counter this problem, regularisation is performed. In regularisation, the parameter values are penalized. In ridge regression, the $L^2$ norm of the parameter vector is penalized and in lasso regression, the $L^1$ norm of the parameter vector is penalized. This is done by modifying the cost functions as follows
 \begin{align}
-    \mathcal{C}_{ridge}(\beta) &=  \frac{1}{n}( y -  {X\beta})^T( y -  {X\beta}) + \lambda||\beta||_2^2 \\
-    \mathcal{C}_{lasso}(\beta) &=  \frac{1}{n}( y -  {X\beta})^T( y -  {X\beta}) + \lambda||\beta||_1
+    \mathcal{C}_{ridge}(\beta) &=  \frac{1}{n}( y -  {X\beta})^T( y -  {X\beta}) + \lambda||\beta||_2^2, \\
+    \mathcal{C}_{lasso}(\beta) &=  \frac{1}{n}( y -  {X\beta})^T( y -  {X\beta}) + \lambda||\beta||_1.
 \end{align}
 
 \subsubsection{Feature Scaling}\label{subsubsec:scaling}
