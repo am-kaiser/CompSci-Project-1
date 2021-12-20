@@ -24,8 +24,7 @@ setuptools.setup(
     classifiers=[
         'Intended Audience :: Science/Research',
         'Programming Language :: Python :: 3',
-        'Operating System :: Microsoft :: Windows',
         'Natural Language :: English',
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.9',
 )

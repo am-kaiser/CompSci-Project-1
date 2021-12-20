@@ -7,7 +7,11 @@ This repository contains scripts to perform regression analysis and apply resamp
 * [Report](documentation/report/main.pdf)
 
 ## How to setup
-Run one of the following lines depending on your use case.
+1. Create conda environment
+```python
+conda create --name compsci_project_1 --file requirements.txt
+```
+2. Run one of the following lines depending on your use case.
 ```python
 # if you only want to run the code
 python setup.py install
